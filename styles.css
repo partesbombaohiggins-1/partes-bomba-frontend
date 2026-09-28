@@ -1,0 +1,203 @@
+/* ==========================================================
+   1. PALETA DE COLORES OFICIAL BOMBARRIA (1ª CÍA. BOMBA O'HIGGINS)
+   ========================================================== */
+
+:root {
+  --verde-ohiggins: #006B3F;       /* Verde institucional */
+  --verde-ohiggins-dark: #004D2D;  /* Verde oscuro hover */
+  --dorado-ohiggins: #D4AF37;     /* Dorado del escudo */
+  --negro-bombero: #1C1C1C;        /* Negro carbón */
+  --gris-fondo: #F4F6F7;           /* Fondo gris suave */
+}
+
+body {
+  background-color: var(--gris-fondo);
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  padding-bottom: 24px;
+}
+
+/* ==========================================================
+   2. ENCABEZADO Y PESTAÑAS DE NAVEGACIÓN
+   ========================================================== */
+
+header.container {
+  padding-top: 0.5rem !important;
+  padding-bottom: 0.5rem !important;
+}
+
+.header-logo {
+  max-width: 125px;
+  height: auto;
+  transition: max-width 0.3s ease;
+}
+
+@media (max-width: 768px) {
+  .header-logo {
+    max-width: 85px;
+  }
+}
+
+.nav-pills .nav-link {
+  font-weight: bold;
+  color: var(--negro-bombero);
+  border: 1px solid #dee2e6;
+  background-color: #ffffff;
+  transition: all 0.2s ease-in-out;
+}
+
+.nav-pills .nav-link:hover {
+  background-color: #e9ecef;
+  color: var(--verde-ohiggins);
+}
+
+.nav-pills .nav-link.active {
+  background-color: var(--verde-ohiggins) !important;
+  color: #ffffff !important;
+  border-color: var(--verde-ohiggins) !important;
+  box-shadow: 0 4px 8px rgba(0, 107, 63, 0.25);
+}
+
+/* ==========================================================
+   3. TARJETAS Y SECCIONES
+   ========================================================== */
+
+.card {
+  border-radius: 8px;
+  overflow: visible !important;
+}
+
+.card-header {
+  border-top-left-radius: 8px !important;
+  border-top-right-radius: 8px !important;
+}
+
+/* Adaptación cromática por Verde Bomba O'Higgins */
+.bg-danger {
+  background-color: var(--verde-ohiggins) !important;
+}
+
+.text-danger {
+  color: var(--verde-ohiggins) !important;
+}
+
+.btn-danger {
+  background-color: var(--verde-ohiggins) !important;
+  border-color: var(--verde-ohiggins) !important;
+  color: #ffffff !important;
+  font-weight: bold;
+}
+
+.btn-danger:hover {
+  background-color: var(--verde-ohiggins-dark) !important;
+  border-color: var(--verde-ohiggins-dark) !important;
+}
+
+.btn-outline-danger {
+  color: var(--verde-ohiggins) !important;
+  border-color: var(--verde-ohiggins) !important;
+}
+
+.btn-outline-danger:hover {
+  background-color: var(--verde-ohiggins) !important;
+  color: #ffffff !important;
+}
+
+/* Badges e Insignias */
+.badge.bg-danger {
+  background-color: var(--dorado-ohiggins) !important;
+  color: var(--negro-bombero) !important;
+  font-weight: bold;
+}
+
+.badge.bg-white.text-danger {
+  background-color: #ffffff !important;
+  color: var(--verde-ohiggins) !important;
+  border: 1px solid var(--verde-ohiggins);
+}
+
+/* ==========================================================
+   4. BUSCADORES Y LISTAS DESPLEGABLES (Z-INDEX)
+   ========================================================== */
+
+.position-relative {
+  position: relative !important;
+}
+
+#resultados-busqueda,
+#resultados-busqueda-cuartel,
+#resultados-busqueda-rescate,
+#resultados-busqueda-cuartel-rescate {
+  background-color: #ffffff !important;
+  border: 2px solid var(--verde-ohiggins);
+  border-radius: 0 0 6px 6px;
+  z-index: 2050 !important;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15) !important;
+}
+
+#resultados-busqueda button,
+#resultados-busqueda-cuartel button,
+#resultados-busqueda-rescate button,
+#resultados-busqueda-cuartel-rescate button {
+  border-radius: 0;
+  border-bottom: 1px solid #e9ecef;
+}
+
+/* ==========================================================
+   5. TABLAS, PASE DE LISTA Y RENDERIZADO PDF
+   ========================================================== */
+
+.table-dark {
+  background-color: var(--negro-bombero) !important;
+  color: #ffffff !important;
+}
+
+.table-responsive {
+  border-radius: 6px;
+}
+
+.sticky-top {
+  z-index: 10;
+}
+
+.chk-asistencia {
+  width: 1.5em;
+  height: 1.5em;
+  cursor: pointer;
+  accent-color: var(--verde-ohiggins);
+}
+
+.table-success {
+  background-color: #D1E7DD !important;
+}
+
+footer.footer-bomberos {
+  background-color: var(--negro-bombero) !important;
+  border-top: 3px solid var(--dorado-ohiggins);
+}
+
+/* Estilos de ocultación en modo PDF */
+.modo-pdf {
+  background-color: #ffffff !important;
+  padding: 20px !important;
+}
+
+.modo-pdf .btn,
+.modo-pdf .form-switch,
+.modo-pdf input[type="file"],
+.modo-pdf #resultados-busqueda,
+.modo-pdf #resultados-busqueda-cuartel,
+.modo-pdf #resultados-busqueda-rescate,
+.modo-pdf #resultados-busqueda-cuartel-rescate {
+  display: none !important;
+}
+
+.modo-pdf .card {
+  border: 1px solid var(--verde-ohiggins) !important;
+  box-shadow: none !important;
+  margin-bottom: 15px !important;
+}
+
+.modo-pdf .card-header {
+  background-color: var(--verde-ohiggins) !important;
+  color: #ffffff !important;
+}

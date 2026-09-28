@@ -1,0 +1,988 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bomba O'Higgins - Partes de Servicio</title>
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="img/logo.png">
+
+  <!-- CSS Bootstrap 5 -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Estilos Personalizados -->
+  <link rel="stylesheet" href="styles.css">
+</head>
+
+<body class="bg-light min-vh-100 d-flex flex-column">
+
+  <!-- Encabezado Institucional Compacto -->
+  <header class="container text-center my-2">
+    <img src="img/logo.png" alt="Escudo Bomba O'Higgins" class="img-fluid header-logo mb-2">
+    <h4 class="fw-bold text-dark m-0 d-none d-md-block">Primera Compañía Bomba O'Higgins</h4>
+    <small class="text-muted d-none d-md-block">Cuerpo de Bomberos de Rancagua</small>
+  </header>
+
+  <div class="container flex-grow-1 pb-3" style="max-width: 800px;">
+
+    <!-- Navegación por Pestañas -->
+    <ul class="nav nav-pills nav-justified mb-3 shadow-sm bg-white p-2 rounded border" id="pills-tab" role="tablist">
+      <li class="nav-item" role="presentation">
+        <button class="nav-link active py-2" id="pills-general-tab" data-bs-toggle="pill"
+          data-bs-target="#pills-general" type="button" role="tab">
+          🚨 Parte Servicio
+        </button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link py-2" id="pills-vehicular-tab" data-bs-toggle="pill" data-bs-target="#pills-vehicular"
+          type="button" role="tab">
+          🚗 Rescate Vehicular
+        </button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link py-2" id="pills-asistencia-tab" data-bs-toggle="pill" data-bs-target="#pills-asistencia"
+          type="button" role="tab">
+          📋 Asistencia
+        </button>
+      </li>
+    </ul>
+
+    <!-- Contenido de las Secciones -->
+    <div class="tab-content" id="pills-tabContent">
+
+      <!-- ==========================================================
+           SECCIÓN 1: INFORME DE SERVICIO GENERAL
+           ========================================================== -->
+      <div class="tab-pane fade show active" id="pills-general" role="tabpanel">
+        <form id="form-parte-general">
+
+          <!-- 1. Datos Generales del Acto -->
+          <div class="card border-0 shadow-sm mb-3">
+            <div class="card-header bg-danger text-white">
+              <h5 class="mb-0 fw-bold">1. Datos Generales del Acto</h5>
+            </div>
+            <div class="card-body">
+              <div class="row g-3 mb-3">
+                <div class="col-12 col-md-6">
+                  <label class="form-label fw-bold">Material Mayor Concurrente</label>
+                  <div class="d-flex gap-3">
+                    <div class="form-check">
+                      <input class="form-check-input" type="checkbox" id="gen-b1" value="B1">
+                      <label class="form-check-label" for="gen-b1">B1</label>
+                    </div>
+                    <div class="form-check">
+                      <input class="form-check-input" type="checkbox" id="gen-bh1" value="BH1">
+                      <label class="form-check-label" for="gen-bh1">BH1</label>
+                    </div>
+                    <div class="form-check">
+                      <input class="form-check-input" type="checkbox" id="gen-h1" value="H1">
+                      <label class="form-check-label" for="gen-h1">H1</label>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-6 col-md-3">
+                  <label for="correlativo-cia" class="form-label fw-bold">Correlativo Cía.</label>
+                  <input type="number" class="form-control form-control-lg" id="correlativo-cia" placeholder="Ej: 12">
+                </div>
+                <div class="col-6 col-md-3">
+                  <label for="correlativo-gen" class="form-label fw-bold">Correlativo Gral.</label>
+                  <input type="number" class="form-control form-control-lg" id="correlativo-gen" placeholder="Ej: 45">
+                </div>
+              </div>
+
+              <div class="row g-3 mb-3">
+                <div class="col-6 col-md-3">
+                  <label for="fecha-acto" class="form-label fw-bold">Fecha</label>
+                  <input type="date" class="form-control form-control-lg" id="fecha-acto">
+                </div>
+                <div class="col-6 col-md-3">
+                  <label for="hora-acto" class="form-label fw-bold">Hora</label>
+                  <input type="time" class="form-control form-control-lg" id="hora-acto">
+                </div>
+
+                <div class="col-12 col-md-6">
+                  <label for="clave-acto" class="form-label fw-bold">Clave del Acto de Servicio</label>
+                  <select class="form-select form-select-lg" id="clave-acto">
+                    <option value="">Seleccionar Clave...</option>
+                    <optgroup label="Incendios Estructurales">
+                      <option value="10-0-1">10-0-1 (Incendio en casa habitación)</option>
+                      <option value="10-0-2">10-0-2 (Incendio en edificio / departamento)</option>
+                      <option value="10-0-3">10-0-3 (Incendio en local con afluencia de publico)</option>
+                      <option value="10-0-4">10-0-4 (Incendio en establecimiento educacional / público)</option>
+                      <option value="10-0-5">10-0-5 (Incendio en recinto industrial / fábrica)</option>
+                    </optgroup>
+                    <optgroup label="Incendios Vehiculares">
+                      <option value="10-1-1">10-1-1 (Incendio de vehículo menor / particular)</option>
+                      <option value="10-1-2">10-1-2 (Incendio de vehículo mayor / colectivo / carga)</option>
+                      <option value="10-1-3">10-1-3 (Fuego o Humo en Vehiculos con Materiales Peligrosos)</option>
+                    </optgroup>
+                    <optgroup label="Incendios en Pastizal / Forestal">
+                      <option value="10-2-1">10-2-1 (Incendio de pastizal / matorral)</option>
+                      <option value="10-2-2">10-2-2 (Incendio forestal / extensión mayor)</option>
+                      <option value="10-2-3">10-2-3 (Incendio de microbasural / acopio)</option>
+                    </optgroup>
+                    <optgroup label="Incidentes HazMat">
+                      <option value="10-5-1">10-5-1 (Incidente Haz-Mat en Vía Publica /Casa habitación)</option>
+                      <option value="10-5-2">10-5-2 (Incidente Haz-Mat Estructural)</option>
+                      <option value="10-5-3">10-5-3 (Incidente Haz-Mat con Victimas Intoxicadas)</option>
+                      <option value="10-5-4">10-5-4 (Derrames de Hidrocarburos)</option>
+                    </optgroup>
+                    <optgroup label="Gases Combustibles">
+                      <option value="10-6-1">10-6-1 (Fuga de gas en casa habitación o Vía Publica)</option>
+                      <option value="10-6-2">10-6-2 (Fuga de gas en departamento)</option>
+                      <option value="10-6-3">10-6-3 (Fuga de gas en con victimas intoxicadas)</option>
+                    </optgroup>
+                    <optgroup label="Incidente Eléctrico">
+                      <option value="10-7">10-7 (Incidente Electrico en casa habitación)</option>
+                    </optgroup>
+                    <optgroup label="No Clasificados">
+                      <option value="10-8-1">10-8-1 (Llamado por activacion de alarma)</option>
+                      <option value="10-8-2">10-8-2 (Llamado por fuego en kiosko, caseta o letrero)</option>
+                    </optgroup>
+                    <optgroup label="Otros Servicios">
+                      <option value="10-9-1">10-9-1 (Apertura de vivienda de 1 a 3 pisos)</option>
+                      <option value="10-9-2">10-9-2 (Apertura de vivienda de departamento de 4 pisos o mas)</option>
+                      <option value="10-9-3">10-9-3 (Otros servicios)</option>
+                      <option value="10-9-4">10-9-4 (Recuperacion de Cavader)</option>
+                    </optgroup>
+                    <optgroup label="Rebrote">
+                      <option value="10-10">10-10 (Rebrote de incendio)</option>
+                    </optgroup>
+                    <optgroup label="Apoyo Aéreo">
+                      <option value="10-11">10-11 (Apoyo o resguardo a servicio / aeronave)</option>
+                    </optgroup>
+                    <optgroup label="Apoyo a Otro Cuerpo de Bomberos">
+                      <option value="10-12">10-12 (Apoyo a otro Cuerpo de Bomberos)</option>
+                    </optgroup>
+                    <optgroup label="Artefacto Explosivo">
+                      <option value="10-13">10-13 (Presencia o amenaza de artefacto explosivo)</option>
+                    </optgroup>
+                    <optgroup label="Accidente Aéreo">
+                      <option value="10-14">10-14 (Accidente o caída de aeronave)</option>
+                    </optgroup>
+                    <optgroup label="Simulacro">
+                      <option value="10-15">10-15 (Ejercicios y simulacros programados)</option>
+                    </optgroup>
+                  </select>
+                </div>
+              </div>
+
+              <div class="row g-3">
+                <div class="col-12 col-md-6">
+                  <label for="direccion-acto" class="form-label fw-bold">Dirección</label>
+                  <input type="text" class="form-control form-control-lg" id="direccion-acto" placeholder="Calle y número">
+                </div>
+                <div class="col-12 col-md-6">
+                  <label for="poblacion-villa" class="form-label fw-bold">Población / Villa</label>
+                  <input type="text" class="form-control form-control-lg" id="poblacion-villa" placeholder="Ej: Villa Triana">
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 2. Características del Lugar -->
+          <div class="card border-0 shadow-sm mb-3">
+            <div class="card-header bg-secondary text-white">
+              <h5 class="mb-0 fw-bold">2. Características del Lugar</h5>
+            </div>
+            <div class="card-body">
+              <div class="row g-3 mb-3">
+                <div class="col-12 col-md-6">
+                  <label for="lugar-tipo" class="form-label fw-bold">Tipo de Lugar</label>
+                  <select class="form-select form-select-lg" id="lugar-tipo">
+                    <option value="">Seleccionar...</option>
+                    <option value="Vivienda">Vivienda</option>
+                    <option value="Departamento">Departamento</option>
+                    <option value="Negocio">Negocio</option>
+                    <option value="Industria">Industria</option>
+                    <option value="Sitio Eriazo">Sitio Eriazo</option>
+                    <option value="Vía Pública">Vía Pública</option>
+                  </select>
+                </div>
+                <div class="col-12 col-md-6">
+                  <label for="construccion-tipo" class="form-label fw-bold">Tipo de Construcción</label>
+                  <select class="form-select form-select-lg" id="construccion-tipo">
+                    <option value="">Seleccionar...</option>
+                    <option value="Hormigón">Hormigón</option>
+                    <option value="Albañilería">Albañilería (Ladrillo)</option>
+                    <option value="Madera">Madera</option>
+                    <option value="Pre-fabricada">Pre-fabricada</option>
+                    <option value="Mixta">Mixta</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="row g-3 mb-3">
+                <div class="col-12 col-md-4">
+                  <label for="cant-ocupantes" class="form-label fw-bold">N° de Ocupantes / Propietarios</label>
+                  <select class="form-select form-select-lg" id="cant-ocupantes">
+                    <option value="1" selected>1 Persona</option>
+                    <option value="2">2 Personas</option>
+                    <option value="3">3 Personas</option>
+                    <option value="4">4 Personas</option>
+                  </select>
+                </div>
+              </div>
+
+              <div id="contenedor-ocupantes">
+                <div class="row g-3 mb-3 ocupante-item" id="bloque-ocupante-1">
+                  <div class="col-12 col-md-8">
+                    <label for="ocupado-por-1" class="form-label fw-bold">Nombre Ocupante / Propietario 1</label>
+                    <input type="text" class="form-control form-control-lg" id="ocupado-por-1" placeholder="Nombre completo">
+                  </div>
+                  <div class="col-12 col-md-4">
+                    <label for="run-ocupante-1" class="form-label fw-bold">R.U.N.</label>
+                    <input type="text" class="form-control form-control-lg" id="run-ocupante-1" placeholder="12.345.678-K">
+                  </div>
+                </div>
+
+                <div class="row g-3 mb-3 ocupante-item d-none" id="bloque-ocupante-2">
+                  <div class="col-12 col-md-8">
+                    <label for="ocupado-por-2" class="form-label fw-bold">Nombre Ocupante / Propietario 2</label>
+                    <input type="text" class="form-control form-control-lg" id="ocupado-por-2" placeholder="Nombre completo">
+                  </div>
+                  <div class="col-12 col-md-4">
+                    <label for="run-ocupante-2" class="form-label fw-bold">R.U.N.</label>
+                    <input type="text" class="form-control form-control-lg" id="run-ocupante-2" placeholder="12.345.678-K">
+                  </div>
+                </div>
+
+                <div class="row g-3 mb-3 ocupante-item d-none" id="bloque-ocupante-3">
+                  <div class="col-12 col-md-8">
+                    <label for="ocupado-por-3" class="form-label fw-bold">Nombre Ocupante / Propietario 3</label>
+                    <input type="text" class="form-control form-control-lg" id="ocupado-por-3" placeholder="Nombre completo">
+                  </div>
+                  <div class="col-12 col-md-4">
+                    <label for="run-ocupante-3" class="form-label fw-bold">R.U.N.</label>
+                    <input type="text" class="form-control form-control-lg" id="run-ocupante-3" placeholder="12.345.678-K">
+                  </div>
+                </div>
+
+                <div class="row g-3 mb-3 ocupante-item d-none" id="bloque-ocupante-4">
+                  <div class="col-12 col-md-8">
+                    <label for="ocupado-por-4" class="form-label fw-bold">Nombre Ocupante / Propietario 4</label>
+                    <input type="text" class="form-control form-control-lg" id="ocupado-por-4" placeholder="Nombre completo">
+                  </div>
+                  <div class="col-12 col-md-4">
+                    <label for="run-ocupante-4" class="form-label fw-bold">R.U.N.</label>
+                    <input type="text" class="form-control form-control-lg" id="run-ocupante-4" placeholder="12.345.678-K">
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 3. Instituciones y Oficiales a Cargo -->
+          <div class="card border-0 shadow-sm mb-3">
+            <div class="card-header bg-secondary text-white">
+              <h5 class="mb-0 fw-bold">3. Instituciones y Oficiales a Cargo</h5>
+            </div>
+            <div class="card-body">
+              <div class="row g-3 mb-3">
+                <div class="col-12 col-md-6">
+                  <label for="amb-procedencia" class="form-label fw-bold">SAMU / Ambulancia</label>
+                  <input type="text" class="form-control form-control-lg" id="amb-procedencia" placeholder="Ej: SAMU Móvil 21 / Paramedico a cargo">
+                </div>
+                <div class="col-12 col-md-6">
+                  <label for="carab-patente" class="form-label fw-bold">Carabineros</label>
+                  <input type="text" class="form-control form-control-lg" id="carab-patente" placeholder="Ej: Radio Patrulla Z-6520 / 1ª Comisaría">
+                </div>
+              </div>
+
+              <div class="row g-3 mb-3">
+                <div class="col-12 col-md-6">
+                  <label for="seguridad-rescate" class="form-label fw-bold">Seguridad Pública Municipal</label>
+                  <input type="text" class="form-control form-control-lg" id="seguridad-rescate" placeholder="Móvil / Inspector a cargo">
+                </div>
+                <div class="col-12 col-md-6">
+                  <label for="autopista-movil" class="form-label fw-bold">Autopista / Asistencia Vial</label>
+                  <input type="text" class="form-control form-control-lg" id="autopista-movil" placeholder="Grúa / Móvil de rescate vial">
+                </div>
+              </div>
+
+              <div class="row g-3">
+                <div class="col-12 col-md-6">
+                  <label for="oficial-rescate-cia" class="form-label fw-bold">Voluntario / Oficial a Cargo Cía.</label>
+                  <input type="text" class="form-control form-control-lg" id="oficial-rescate-cia" placeholder="Nombre y Grado">
+                </div>
+                <div class="col-12 col-md-6">
+                  <label for="oficial-rescate-cuerpo" class="form-label fw-bold">Oficial a Cargo del Cuerpo</label>
+                  <input type="text" class="form-control form-control-lg" id="oficial-rescate-cuerpo" placeholder="Comandante / Capitán">
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 4. Registro Fotográfico e Investigación -->
+          <div class="card border-0 shadow-sm mb-3">
+            <div class="card-header bg-secondary text-white">
+              <h5 class="mb-0 fw-bold">4. Registro Fotográfico e Investigación</h5>
+            </div>
+            <div class="card-body">
+              <div class="row g-3 mb-3">
+                <div class="col-12 col-md-6">
+                  <label class="form-label fw-bold">Material de Apoyo a la Investigación</label>
+                  <div class="d-flex flex-wrap gap-3">
+                    <div class="form-check">
+                      <input class="form-check-input" type="checkbox" id="inv-fotos">
+                      <label class="form-check-label" for="inv-fotos">Fotos</label>
+                    </div>
+                    <div class="form-check">
+                      <input class="form-check-input" type="checkbox" id="inv-videos">
+                      <label class="form-check-label" for="inv-videos">Videos</label>
+                    </div>
+                    <div class="form-check">
+                      <input class="form-check-input" type="checkbox" id="inv-muestras">
+                      <label class="form-check-label" for="inv-muestras">Muestras</label>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-12 col-md-6">
+                  <label class="form-label fw-bold">¿Tomó Estadística?</label>
+                  <div class="d-flex gap-4">
+                    <div class="form-check">
+                      <input class="form-check-input" type="radio" name="estadistica" id="est-si" value="SI">
+                      <label class="form-check-label" for="est-si">Sí</label>
+                    </div>
+                    <div class="form-check">
+                      <input class="form-check-input" type="radio" name="estadistica" id="est-no" value="NO">
+                      <label class="form-check-label" for="est-no">No</label>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="border rounded p-3 bg-light mb-3">
+                <label for="input-fotos-registro" class="form-label fw-bold text-dark mb-1">
+                  📸 Adjuntar Fotos / Capturas de la Emergencia
+                </label>
+                <input class="form-control form-control-lg mb-2" type="file" id="input-fotos-registro" accept="image/*" multiple>
+                <small class="text-muted d-block mb-2">Puedes adjuntar múltiples imágenes o tomar fotos directamente desde la cámara del dispositivo.</small>
+                <div id="vista-previa-fotos" class="d-flex flex-wrap gap-3 pt-2"></div>
+              </div>
+
+              <div class="mb-3">
+                <label for="croquis-observaciones" class="form-label fw-bold">Croquis de Ubicación / Descripción del Siniestro</label>
+                <textarea class="form-control" id="croquis-observaciones" rows="3" placeholder="Describa la ubicación del acto, accesos o puntos de ataque..."></textarea>
+              </div>
+
+              <div class="row g-3 mb-3">
+                <div class="col-12 col-md-6">
+                  <label for="artefacto-origen" class="form-label fw-bold">Origen</label>
+                  <input type="text" class="form-control form-control-lg" id="artefacto-origen" placeholder="Ej: Estufa, empalme">
+                </div>
+                <div class="col-12 col-md-6">
+                  <label for="causa-fuego" class="form-label fw-bold">Causa</label>
+                  <input type="text" class="form-control form-control-lg" id="causa-fuego" placeholder="Ej: Falla eléctrica">
+                </div>
+              </div>
+              <div class="row g-3">
+                <div class="col-12 col-md-6">
+                  <label for="det-cargo" class="form-label fw-bold">D.E.T</label>
+                  <input type="text" class="form-control form-control-lg" id="det-cargo" placeholder="Ej: A CARGO DEL DET">
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 5. Personal Asistente al Acto y En Cuartel -->
+          <div class="card border-0 shadow-sm mb-3">
+            <div class="card-header bg-danger text-white">
+              <h5 class="mb-0 fw-bold">5. Personal Asistente al Acto</h5>
+            </div>
+            <div class="card-body">
+              <h6 class="fw-bold text-danger mb-2">🚨 Personal Asistente al Acto</h6>
+              <div class="position-relative mb-3">
+                <label for="buscar-bombero" class="form-label fw-bold small">Buscar Voluntario (En el Acto)</label>
+                <input type="text" class="form-control form-control-lg" id="buscar-bombero" placeholder="Ej: Guzman, Fabian, 63..." autocomplete="off">
+                <div id="resultados-busqueda" class="list-group position-absolute w-100 shadow-lg mt-1" style="z-index: 2050; max-height: 200px; overflow-y: auto; display: none;"></div>
+              </div>
+
+              <div class="table-responsive mb-4">
+                <table class="table table-bordered table-hover align-middle mb-0">
+                  <thead class="table-dark">
+                    <tr>
+                      <th style="width: 60px;">N°</th>
+                      <th>Nombre</th>
+                      <th style="width: 80px;" class="text-center">Tipo</th>
+                      <th style="width: 70px;" class="text-center">Quitar</th>
+                    </tr>
+                  </thead>
+                  <tbody id="tabla-asistentes-cuerpo">
+                    <tr id="sin-asistentes">
+                      <td colspan="4" class="text-center text-muted">No hay voluntarios registrados en el acto.</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+
+              <div class="form-check form-switch p-3 bg-light rounded border my-3">
+                <input class="form-check-input ms-0 me-3" type="checkbox" id="switch-en-cuartel" role="switch" style="transform: scale(1.3);">
+                <label class="form-check-label fw-bold text-dark" for="switch-en-cuartel">
+                  🏢 Registrar Personal "En Cuartel" (Permanecen en la bomba)
+                </label>
+              </div>
+
+              <div id="contenedor-en-cuartel" class="pt-2 d-none">
+                <h6 class="fw-bold text-secondary mb-2">🏢 Personal Registrado En Cuartel</h6>
+                <div class="position-relative mb-3">
+                  <label for="buscar-bombero-cuartel" class="form-label fw-bold small">Buscar Voluntario (En Cuartel)</label>
+                  <input type="text" class="form-control form-control-lg" id="buscar-bombero-cuartel" placeholder="Ej: Guzman, Fabian, 63..." autocomplete="off">
+                  <div id="resultados-busqueda-cuartel" class="list-group position-absolute w-100 shadow-lg mt-1" style="z-index: 2050; max-height: 200px; overflow-y: auto; display: none;"></div>
+                </div>
+
+                <div class="table-responsive">
+                  <table class="table table-bordered table-hover align-middle mb-0">
+                    <thead class="table-secondary">
+                      <tr>
+                        <th style="width: 60px;">N°</th>
+                        <th>Nombre</th>
+                        <th style="width: 80px;" class="text-center">Tipo</th>
+                        <th style="width: 70px;" class="text-center">Quitar</th>
+                      </tr>
+                    </thead>
+                    <tbody id="tabla-cuartel-cuerpo">
+                      <tr id="sin-cuartel">
+                        <td colspan="4" class="text-center text-muted">No hay voluntarios registrados en cuartel.</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+          <!-- Acciones Finales: Descargar y Enviar -->
+          <div class="card border-0 shadow-sm mt-3 mb-2">
+            <div class="card-body p-3">
+              <div class="mb-3">
+                <label for="observaciones-parte" class="form-label fw-bold">Resumen del Acto / Observaciones</label>
+                <textarea class="form-control" id="observaciones-parte" rows="3" placeholder="Detalles finales del acto de servicio..."></textarea>
+              </div>
+              <div class="row g-2">
+                <div class="col-12 col-md-6">
+                  <button type="button" class="btn btn-outline-success btn-lg w-100 py-3 fw-bold btn-descargar-pdf" data-form="pills-general">
+                    📄 Descargar PDF
+                  </button>
+                </div>
+                <div class="col-12 col-md-6">
+                  <button type="button" class="btn btn-danger btn-lg w-100 py-3 fw-bold btn-enviar-correo" data-form="pills-general">
+                    ✉️ Enviar por Correo
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </form>
+      </div>
+
+      <!-- ==========================================================
+           SECCIÓN 2: INFORME DE SERVICIO RESCATE VEHICULAR
+           ========================================================== -->
+      <div class="tab-pane fade" id="pills-vehicular" role="tabpanel">
+        <form id="form-parte-vehicular">
+
+          <!-- 1. Datos Generales del Rescate -->
+          <div class="card border-0 shadow-sm mb-3">
+            <div class="card-header bg-danger text-white">
+              <h5 class="mb-0 fw-bold">1. Datos Generales del Rescate</h5>
+            </div>
+            <div class="card-body">
+              <div class="row g-3 mb-3">
+                <div class="col-12 col-md-6">
+                  <label class="form-label fw-bold">Material Mayor Concurrente</label>
+                  <div class="d-flex flex-wrap gap-3">
+                    <div class="form-check">
+                      <input class="form-check-input" type="checkbox" id="veh-b1" value="B1">
+                      <label class="form-check-label" for="veh-b1">B1</label>
+                    </div>
+                    <div class="form-check">
+                      <input class="form-check-input" type="checkbox" id="veh-bh1" value="BH1">
+                      <label class="form-check-label" for="veh-bh1">BH1</label>
+                    </div>
+                    <div class="form-check">
+                      <input class="form-check-input" type="checkbox" id="veh-h1" value="H1">
+                      <label class="form-check-label" for="veh-h1">H1</label>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-6 col-md-3">
+                  <label for="correlativo-veh" class="form-label fw-bold">Correlativo Cía.</label>
+                  <input type="number" class="form-control form-control-lg" id="correlativo-veh" placeholder="Ej: 14">
+                </div>
+                <div class="col-6 col-md-3">
+                  <label for="guardia-nocturna" class="form-label fw-bold">Guardia Nocturna</label>
+                  <select class="form-select form-select-lg" id="guardia-nocturna">
+                    <option value="NO">No</option>
+                    <option value="SI">Sí</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="row g-3 mb-3">
+                <div class="col-6 col-md-3">
+                  <label for="fecha-veh" class="form-label fw-bold">Fecha</label>
+                  <input type="date" class="form-control form-control-lg" id="fecha-veh">
+                </div>
+                <div class="col-6 col-md-3">
+                  <label for="hora-veh" class="form-label fw-bold">Hora</label>
+                  <input type="time" class="form-control form-control-lg" id="hora-veh">
+                </div>
+                <div class="col-12 col-md-6">
+                  <label for="clave-vehicular" class="form-label fw-bold">Clave del Rescate</label>
+                  <select class="form-select form-select-lg" id="clave-vehicular">
+                    <option value="">Seleccionar Clave de Rescate...</option>
+                    <optgroup label="Rescate Vehicular (10-4)">
+                      <option value="10-4-1">10-4-1 (Rescate vehicular hasta 2 vehículos menores)</option>
+                      <option value="10-4-2">10-4-2 (Rescate vehicular con vehículo de transporte público / carga)</option>
+                      <option value="10-4-3">10-4-3 (Rescate vehicular con atrapados / extricación)</option>
+                      <option value="10-4-4">10-4-4 (Atropello / Atrapamiento por estructura vehicular)</option>
+                    </optgroup>
+                  </select>
+                </div>
+              </div>
+
+              <div class="row g-3 mb-3">
+                <div class="col-12 col-md-6">
+                  <label for="direccion-veh" class="form-label fw-bold">Dirección / Ruta</label>
+                  <input type="text" class="form-control form-control-lg" id="direccion-veh" placeholder="Ej: Av. Copiapó / Ruta 5 Sur Km 85">
+                </div>
+                <div class="col-12 col-md-6">
+                  <label for="esquina-veh" class="form-label fw-bold">Esquina / Pistas Afectadas</label>
+                  <input type="text" class="form-control form-control-lg" id="esquina-veh" placeholder="Ej: Esquina Freire / Pista Lenta">
+                </div>
+              </div>
+
+              <div class="mb-2">
+                <label class="form-label fw-bold">Tipo de Accidente</label>
+                <div class="d-flex flex-wrap gap-3">
+                  <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="tipo-colision" value="Colisión">
+                    <label class="form-check-label" for="tipo-colision">Colisión</label>
+                  </div>
+                  <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="tipo-choque" value="Choque">
+                    <label class="form-check-label" for="tipo-choque">Choque</label>
+                  </div>
+                  <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="tipo-volcamiento" value="Volcamiento">
+                    <label class="form-check-label" for="tipo-volcamiento">Volcamiento</label>
+                  </div>
+                  <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="tipo-atropello" value="Atropello">
+                    <label class="form-check-label" for="tipo-atropello">Atropello</label>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 2. Identificación del Vehículo 1 y Conductor -->
+          <div class="card border-0 shadow-sm mb-3">
+            <div class="card-header bg-secondary text-white">
+              <h5 class="mb-0 fw-bold">2. Identificación del Vehículo 1 y Conductor</h5>
+            </div>
+            <div class="card-body">
+              <div class="row g-3 mb-3">
+                <div class="col-12 col-md-6">
+                  <label for="v1-nombre" class="form-label fw-bold">Nombre del Conductor</label>
+                  <input type="text" class="form-control form-control-lg" id="v1-nombre" placeholder="Nombre completo">
+                </div>
+                <div class="col-6 col-md-3">
+                  <label for="v1-ci" class="form-label fw-bold">C.I. / R.U.N.</label>
+                  <input type="text" class="form-control form-control-lg" id="v1-ci" placeholder="12.345.678-K">
+                </div>
+                <div class="col-6 col-md-3">
+                  <label for="v1-patente" class="form-label fw-bold">Patente</label>
+                  <input type="text" class="form-control form-control-lg" id="v1-patente" placeholder="AA-BB-11">
+                </div>
+              </div>
+
+              <div class="row g-3 mb-3">
+                <div class="col-6 col-md-4">
+                  <label for="v1-marca" class="form-label fw-bold">Marca</label>
+                  <input type="text" class="form-control form-control-lg" id="v1-marca" placeholder="Ej: Toyota">
+                </div>
+                <div class="col-6 col-md-4">
+                  <label for="v1-modelo" class="form-label fw-bold">Modelo</label>
+                  <input type="text" class="form-control form-control-lg" id="v1-modelo" placeholder="Ej: Yaris">
+                </div>
+                <div class="col-12 col-md-4">
+                  <label for="v1-color" class="form-label fw-bold">Color</label>
+                  <input type="text" class="form-control form-control-lg" id="v1-color" placeholder="Ej: Blanco">
+                </div>
+              </div>
+
+              <div class="row g-3 mb-3">
+                <div class="col-12 col-md-6">
+                  <label for="v1-tipo-vehiculo" class="form-label fw-bold">Tipo de Vehículo</label>
+                  <select class="form-select form-select-lg" id="v1-tipo-vehiculo">
+                    <option value="Particular">Particular</option>
+                    <option value="Transporte Público">Transporte Público</option>
+                    <option value="Veh. de Carga / Camión">Vehículo de Carga / Camión</option>
+                    <option value="Motocicleta">Motocicleta</option>
+                    <option value="Otro">Otro</option>
+                  </select>
+                </div>
+                <div class="col-12 col-md-6">
+                  <label for="v1-derivado" class="form-label fw-bold">Derivado / Traslado por SAMU a</label>
+                  <select class="form-select form-select-lg" id="v1-derivado">
+                    <option value="">Seleccionar centro asistencial...</option>
+                    <option value="Hospital Regional Rancagua">Hospital Regional Rancagua</option>
+                    <option value="Hospital FUSAT">Hospital FUSAT</option>
+                    <option value="Clínica ISAMEDICA">Clínica ISAMEDICA</option>
+                    <option value="Mutual de Seguridad">Mutual de Seguridad</option>
+                    <option value="SAR María Latife">SAR María Latife</option>
+                    <option value="Otro">Otro</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="row g-3 mb-3">
+                <div class="col-4 col-md-3">
+                  <label for="v1-adultos" class="form-label fw-bold">N° Adultos</label>
+                  <input type="number" class="form-control form-control-lg" id="v1-adultos" value="0" min="0">
+                </div>
+                <div class="col-4 col-md-3">
+                  <label for="v1-menores" class="form-label fw-bold">N° Menores</label>
+                  <input type="number" class="form-control form-control-lg" id="v1-menores" value="0" min="0">
+                </div>
+                <div class="col-4 col-md-3">
+                  <label for="v1-lactantes" class="form-label fw-bold">Lactantes</label>
+                  <input type="number" class="form-control form-control-lg" id="v1-lactantes" value="0" min="0">
+                </div>
+                <div class="col-12 col-md-3">
+                  <label for="v1-fallecidos" class="form-label fw-bold text-danger">N° Fallecidos</label>
+                  <input type="number" class="form-control form-control-lg border-danger" id="v1-fallecidos" value="0" min="0">
+                </div>
+              </div>
+
+              <div class="mb-2">
+                <label class="form-label fw-bold">Nivel Estimado de Daños del Vehículo</label>
+                <div class="d-flex flex-wrap gap-4">
+                  <div class="form-check">
+                    <input class="form-check-input" type="radio" name="danos-v1" id="d-leve" value="Leves">
+                    <label class="form-check-label" for="d-leve">Leves</label>
+                  </div>
+                  <div class="form-check">
+                    <input class="form-check-input" type="radio" name="danos-v1" id="d-mediano" value="Medianos">
+                    <label class="form-check-label" for="d-mediano">Medianos</label>
+                  </div>
+                  <div class="form-check">
+                    <input class="form-check-input" type="radio" name="danos-v1" id="d-grave" value="Graves">
+                    <label class="form-check-label" for="d-grave">Graves / Destrucción Total</label>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 3. Material Menor Utilizado -->
+          <div class="card border-0 shadow-sm mb-3">
+            <div class="card-header bg-dark text-white">
+              <h5 class="mb-0 fw-bold">3. Material Menor Utilizado</h5>
+            </div>
+            <div class="card-body">
+              <div class="row g-3">
+                <div class="col-6 col-md-3">
+                  <label for="mat-collares" class="form-label fw-bold">Collares Cervicales</label>
+                  <input type="number" class="form-control form-control-lg" id="mat-collares" value="0" min="0">
+                </div>
+                <div class="col-6 col-md-3">
+                  <label for="mat-tablas" class="form-label fw-bold">Tablas Espinales</label>
+                  <input type="number" class="form-control form-control-lg" id="mat-tablas" value="0" min="0">
+                </div>
+                <div class="col-6 col-md-3">
+                  <label for="mat-chalecos" class="form-label fw-bold">Chalecos Extricación</label>
+                  <input type="number" class="form-control form-control-lg" id="mat-chalecos" value="0" min="0">
+                </div>
+                <div class="col-6 col-md-3">
+                  <label for="mat-pulpos" class="form-label fw-bold">N° Pulpos / Correas</label>
+                  <input type="number" class="form-control form-control-lg" id="mat-pulpos" value="0" min="0">
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 4. Instituciones y Oficiales a Cargo -->
+          <div class="card border-0 shadow-sm mb-3">
+            <div class="card-header bg-secondary text-white">
+              <h5 class="mb-0 fw-bold">4. Instituciones y Oficiales a Cargo</h5>
+            </div>
+            <div class="card-body">
+              <div class="row g-3 mb-3">
+                <div class="col-12 col-md-6">
+                  <label for="veh-amb-procedencia" class="form-label fw-bold">SAMU / Ambulancia</label>
+                  <input type="text" class="form-control form-control-lg" id="veh-amb-procedencia" placeholder="Ej: SAMU Móvil 21 / Paramedico a cargo">
+                </div>
+                <div class="col-12 col-md-6">
+                  <label for="veh-carab-patente" class="form-label fw-bold">Carabineros</label>
+                  <input type="text" class="form-control form-control-lg" id="veh-carab-patente" placeholder="Ej: Radio Patrulla Z-6520 / 1ª Comisaría">
+                </div>
+              </div>
+
+              <div class="row g-3 mb-3">
+                <div class="col-12 col-md-6">
+                  <label for="veh-seguridad-rescate" class="form-label fw-bold">Seguridad Pública Municipal</label>
+                  <input type="text" class="form-control form-control-lg" id="veh-seguridad-rescate" placeholder="Móvil / Inspector a cargo">
+                </div>
+                <div class="col-12 col-md-6">
+                  <label for="veh-autopista-movil" class="form-label fw-bold">Autopista / Asistencia Vial</label>
+                  <input type="text" class="form-control form-control-lg" id="veh-autopista-movil" placeholder="Grúa / Móvil de rescate vial">
+                </div>
+              </div>
+
+              <div class="row g-3">
+                <div class="col-12 col-md-6">
+                  <label for="veh-oficial-rescate-cia" class="form-label fw-bold">Voluntario / Oficial a Cargo Cía.</label>
+                  <input type="text" class="form-control form-control-lg" id="veh-oficial-rescate-cia" placeholder="Nombre y Grado">
+                </div>
+                <div class="col-12 col-md-6">
+                  <label for="veh-oficial-rescate-cuerpo" class="form-label fw-bold">Oficial a Cargo del Cuerpo</label>
+                  <input type="text" class="form-control form-control-lg" id="veh-oficial-rescate-cuerpo" placeholder="Comandante / Capitán">
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 5. Personal Asistente al Rescate y En Cuartel -->
+          <div class="card border-0 shadow-sm mb-3">
+            <div class="card-header bg-danger text-white">
+              <h5 class="mb-0 fw-bold">5. Personal Asistente al Rescate</h5>
+            </div>
+            <div class="card-body">
+              <h6 class="fw-bold text-danger mb-2">🚗 Personal Asistente en el Rescate</h6>
+              <div class="position-relative mb-3">
+                <label for="buscar-bombero-rescate" class="form-label fw-bold small">Buscar Voluntario (En el Rescate)</label>
+                <input type="text" class="form-control form-control-lg" id="buscar-bombero-rescate" placeholder="Ej: Guzman, Fabian, 63..." autocomplete="off">
+                <div id="resultados-busqueda-rescate" class="list-group position-absolute w-100 shadow-lg mt-1" style="z-index: 2050; max-height: 200px; overflow-y: auto; display: none;"></div>
+              </div>
+
+              <div class="table-responsive mb-3">
+                <table class="table table-bordered table-hover align-middle mb-0">
+                  <thead class="table-dark">
+                    <tr>
+                      <th style="width: 60px;">N°</th>
+                      <th>Nombre</th>
+                      <th style="width: 80px;" class="text-center">Tipo</th>
+                      <th style="width: 70px;" class="text-center">Quitar</th>
+                    </tr>
+                  </thead>
+                  <tbody id="tabla-asistentes-rescate-cuerpo">
+                    <tr id="sin-asistentes-rescate">
+                      <td colspan="4" class="text-center text-muted">No hay voluntarios registrados en el rescate.</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+
+              <div class="form-check form-switch p-3 bg-light rounded border my-3">
+                <input class="form-check-input ms-0 me-3" type="checkbox" id="switch-en-cuartel-rescate" role="switch" style="transform: scale(1.3);">
+                <label class="form-check-label fw-bold text-dark" for="switch-en-cuartel-rescate">
+                  🏢 Registrar Personal "En Cuartel" durante el Rescate
+                </label>
+              </div>
+
+              <div id="contenedor-en-cuartel-rescate" class="pt-2 d-none">
+                <h6 class="fw-bold text-secondary mb-2">🏢 Personal Registrado En Cuartel</h6>
+                <div class="position-relative mb-3">
+                  <label for="buscar-bombero-cuartel-rescate" class="form-label fw-bold small">Buscar Voluntario (En Cuartel)</label>
+                  <input type="text" class="form-control form-control-lg" id="buscar-bombero-cuartel-rescate" placeholder="Ej: Guzman, Fabian, 63..." autocomplete="off">
+                  <div id="resultados-busqueda-cuartel-rescate" class="list-group position-absolute w-100 shadow-lg mt-1" style="z-index: 2050; max-height: 200px; overflow-y: auto; display: none;"></div>
+                </div>
+
+                <div class="table-responsive">
+                  <table class="table table-bordered table-hover align-middle mb-0">
+                    <thead class="table-secondary">
+                      <tr>
+                        <th style="width: 60px;">N°</th>
+                        <th>Nombre</th>
+                        <th style="width: 80px;" class="text-center">Tipo</th>
+                        <th style="width: 70px;" class="text-center">Quitar</th>
+                      </tr>
+                    </thead>
+                    <tbody id="tabla-cuartel-rescate-cuerpo">
+                      <tr id="sin-cuartel-rescate">
+                        <td colspan="4" class="text-center text-muted">No hay voluntarios registrados en cuartel.</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+          <!-- Acciones Finales: Descargar y Enviar -->
+          <div class="card border-0 shadow-sm mt-3 mb-2">
+            <div class="card-body p-3">
+              <div class="mb-3">
+                <label for="obs-rescate-vehicular" class="form-label fw-bold">Observaciones del Rescate / Maniobras Realizadas</label>
+                <textarea class="form-control" id="obs-rescate-vehicular" rows="3" placeholder="Detalle la extricación, estabilización, derrame de combustible..."></textarea>
+              </div>
+              <div class="row g-2">
+                <div class="col-12 col-md-6">
+                  <button type="button" class="btn btn-outline-success btn-lg w-100 py-3 fw-bold btn-descargar-pdf" data-form="pills-vehicular">
+                    📄 Descargar PDF
+                  </button>
+                </div>
+                <div class="col-12 col-md-6">
+                  <button type="button" class="btn btn-danger btn-lg w-100 py-3 fw-bold btn-enviar-correo" data-form="pills-vehicular">
+                    ✉️ Enviar por Correo
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </form>
+      </div>
+
+      <!-- ==========================================================
+           SECCIÓN 3: LISTA DE ASISTENCIA DE COMPAÑÍA
+           ========================================================== -->
+      <div class="tab-pane fade" id="pills-asistencia" role="tabpanel">
+        <form id="form-asistencia-cia">
+          
+          <div class="card border-0 shadow-sm mb-3">
+            <div class="card-header bg-danger text-white d-flex justify-content-between align-items-center py-3">
+              <h5 class="mb-0 fw-bold">📋 Control de Asistencia de Compañía</h5>
+              <span class="badge bg-white text-danger fw-bold fs-6" id="contador-asistencia">0 / 81 Presentes</span>
+            </div>
+            <div class="card-body">
+              
+              <div class="row g-3 mb-3">
+                <div class="col-12 col-md-8">
+                  <label for="tipo-citacion-asistencia" class="form-label fw-bold">Tipo de Citación / Actividad</label>
+                  <select class="form-select form-select-lg" id="tipo-citacion-asistencia">
+                    <option value="Citación Obligatoria">Citación Obligatoria</option>
+                    <option value="Academia de Compañía">Academia de Compañía</option>
+                    <option value="Romería / Desfile">Romería / Desfile</option>
+                    <option value="Sesión de Compañía">Sesión de Compañía</option>
+                    <option value="Citación Voluntaria / Extraordinaria">Citación Voluntaria / Extraordinaria</option>
+                  </select>
+                </div>
+                <div class="col-12 col-md-4">
+                  <label for="fecha-citacion-asistencia" class="form-label fw-bold">Fecha</label>
+                  <input type="date" class="form-control form-control-lg" id="fecha-citacion-asistencia">
+                </div>
+              </div>
+
+              <div class="row g-3 mb-3">
+                <div class="col-4 col-md-4">
+                  <label for="hora-inicio-asistencia" class="form-label fw-bold">Hora Inicio</label>
+                  <input type="time" class="form-control form-control-lg" id="hora-inicio-asistencia">
+                </div>
+                <div class="col-4 col-md-4">
+                  <label for="hora-culminacion-asistencia" class="form-label fw-bold">Hora Culminación</label>
+                  <input type="time" class="form-control form-control-lg" id="hora-culminacion-asistencia">
+                </div>
+                <div class="col-4 col-md-4">
+                  <label for="hora-regreso-asistencia" class="form-label fw-bold">Hora Regreso</label>
+                  <input type="time" class="form-control form-control-lg" id="hora-regreso-asistencia">
+                </div>
+              </div>
+
+              <div class="row g-3 mb-3">
+                <div class="col-12 col-md-6">
+                  <label for="oficial-a-cargo-asistencia" class="form-label fw-bold">Oficial a Cargo</label>
+                  <input type="text" class="form-control form-control-lg" id="oficial-a-cargo-asistencia" placeholder="Nombre y Grado del Oficial">
+                </div>
+                <div class="col-12 col-md-6">
+                  <label for="voluntario-a-cargo-asistencia" class="form-label fw-bold">Voluntario a Cargo</label>
+                  <input type="text" class="form-control form-control-lg" id="voluntario-a-cargo-asistencia" placeholder="Nombre del Voluntario a Cargo">
+                </div>
+              </div>
+
+              <div class="row g-3 mb-3">
+                <div class="col-12 col-md-4">
+                  <label for="maquinista-asistencia" class="form-label fw-bold">Maquinista</label>
+                  <input type="text" class="form-control form-control-lg" id="maquinista-asistencia" placeholder="Nombre del Maquinista">
+                </div>
+                <div class="col-12 col-md-4">
+                  <label for="concurre-carro-asistencia" class="form-label fw-bold">Concurre Carro</label>
+                  <input type="text" class="form-control form-control-lg" id="concurre-carro-asistencia" placeholder="Ej: B1 / BH1 / H1">
+                </div>
+                <div class="col-12 col-md-4">
+                  <label for="cias-asistentes-asistencia" class="form-label fw-bold">Compañías Asistentes</label>
+                  <input type="text" class="form-control form-control-lg" id="cias-asistentes-asistencia" placeholder="Ej: 1ª, 3ª, 5ª Cía.">
+                </div>
+              </div>
+
+              <div class="row g-2 align-items-center bg-light p-2 rounded border mt-2">
+                <div class="col-12 col-md-8">
+                  <input type="text" class="form-control form-control-lg" id="filtro-voluntario-asistencia" placeholder="🔍 Filtrar voluntario por nombre o N°..." autocomplete="off">
+                </div>
+                <div class="col-12 col-md-4">
+                  <button type="button" class="btn btn-outline-secondary btn-lg w-100 fw-bold" id="btn-reset-asistencia">Desmarcar Todos</button>
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+          <div class="card border-0 shadow-sm mb-3">
+            <div class="card-body p-0">
+              <div class="table-responsive" style="max-height: 550px; overflow-y: auto;">
+                <table class="table table-hover align-middle mb-0">
+                  <thead class="table-dark sticky-top" style="z-index: 10;">
+                    <tr>
+                      <th style="width: 70px;" class="text-center">N°</th>
+                      <th>Nombre del Voluntario</th>
+                      <th style="width: 90px;" class="text-center">Tipo</th>
+                      <th style="width: 120px;" class="text-center">Asistencia</th>
+                    </tr>
+                  </thead>
+                  <tbody id="tabla-asistencia-completa-cuerpo">
+                    <!-- 81 Voluntarios generados dinámicamente -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <!-- Acciones Finales: Descargar y Enviar -->
+          <div class="card border-0 shadow-sm mt-3 mb-2">
+            <div class="card-body p-3">
+              <div class="mb-3">
+                <label for="obs-asistencia-general" class="form-label fw-bold">Observaciones del Pase de Lista</label>
+                <textarea class="form-control" id="obs-asistencia-general" rows="2" placeholder="Justificaciones, licencias, comisiones de servicio..."></textarea>
+              </div>
+              <div class="row g-2">
+                <div class="col-12 col-md-6">
+                  <button type="button" class="btn btn-outline-success btn-lg w-100 py-3 fw-bold btn-descargar-pdf" data-form="pills-asistencia">
+                    📄 Descargar PDF
+                  </button>
+                </div>
+                <div class="col-12 col-md-6">
+                  <button type="button" class="btn btn-danger btn-lg w-100 py-3 fw-bold btn-enviar-correo" data-form="pills-asistencia">
+                    ✉️ Enviar por Correo
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </form>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Pie de Página Institucional -->
+  <footer class="footer-bomberos py-3 text-center text-white-50 mt-auto bg-dark">
+    <small>© 2026 Primera Compañía de Bomberos "Bomba O'Higgins" — Rancagua</small>
+  </footer>
+
+  <!-- JS Bootstrap 5 -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <!-- Librería Generadora de PDF -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+  <!-- Script Principal de la Aplicación -->
+  <script src="script.js"></script>
+</body>
+
+</html>
