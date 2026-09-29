@@ -658,7 +658,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
-  // ENVÍO AUTOMÁTICO COMPLETO A EMAILJS
+  // ENVÍO DE DATOS TEXTUALES COMPLETOS A EMAILJS
   document.querySelectorAll(".btn-enviar-correo").forEach(btn => {
     btn.addEventListener("click", (e) => {
       const botonPresionado = e.currentTarget;
@@ -668,7 +668,6 @@ document.addEventListener("DOMContentLoaded", () => {
       let correlativoVal = "S-N";
       let fechaVal = new Date().toISOString().slice(0, 10);
 
-      // A. RECOPILACIÓN SECCIÓN 1: INFORME SERVICIO GENERAL
       if (formId === "pills-general") {
         correlativoVal = document.getElementById("correlativo-cia")?.value || "S-N";
         fechaVal = document.getElementById("fecha-acto")?.value || fechaVal;
@@ -697,7 +696,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         const observaciones = document.getElementById("observaciones-parte")?.value || "Sin observaciones.";
 
-        reportEstructurado = `PARTE OFICIAL DE SERVICIO GENERAL - BOMBA O'HIGGINS
+        reporteEstructurado = `PARTE OFICIAL DE SERVICIO GENERAL - BOMBA O'HIGGINS
 --------------------------------------------------
 DATOS DEL ACTO:
 • Correlativo Cía: ${correlativoVal} | General: ${document.getElementById("correlativo-gen")?.value || "S-N"}
@@ -728,8 +727,6 @@ OBSERVACIONES / RESUMEN:
 ${observaciones}
 --------------------------------------------------`;
       } 
-      
-      // B. RECOPILACIÓN SECCIÓN 2: RESCATE VEHICULAR
       else if (formId === "pills-vehicular") {
         correlativoVal = document.getElementById("correlativo-veh")?.value || "S-N";
         fechaVal = document.getElementById("fecha-veh")?.value || fechaVal;
@@ -747,7 +744,7 @@ ${observaciones}
 
         const observaciones = document.getElementById("obs-rescate-vehicular")?.value || "Sin observaciones.";
 
-        reportEstructurado = `PARTE OFICIAL DE RESCATE VEHICULAR - BOMBA O'HIGGINS
+        reporteEstructurado = `PARTE OFICIAL DE RESCATE VEHICULAR - BOMBA O'HIGGINS
 --------------------------------------------------
 DATOS DEL RESCATE:
 • Correlativo Cía: ${correlativoVal}
@@ -770,8 +767,6 @@ OBSERVACIONES DEL RESCATE:
 ${observaciones}
 --------------------------------------------------`;
       } 
-      
-      // C. RECOPILACIÓN SECCIÓN 3: ASISTENCIA
       else if (formId === "pills-asistencia") {
         fechaVal = document.getElementById("fecha-citacion-asistencia")?.value || fechaVal;
         const citacion = document.getElementById("tipo-citacion-asistencia")?.value || "N/E";
@@ -791,7 +786,7 @@ ${observaciones}
 
         const observaciones = document.getElementById("obs-asistencia-general")?.value || "Sin observaciones.";
 
-        reportEstructurado = `CONTROL OFICIAL DE ASISTENCIA - BOMBA O'HIGGINS
+        reporteEstructurado = `CONTROL OFICIAL DE ASISTENCIA - BOMBA O'HIGGINS
 --------------------------------------------------
 DATOS DE LA CITACIÓN:
 • Tipo de Actividad: ${citacion}
