@@ -614,7 +614,7 @@ document.addEventListener("DOMContentLoaded", () => {
   renderizarListaAsistencia();
 
   // ==========================================
-  // 7. DESCARGA PDF Y ENVÍO POR CORREO (EMAILJS INTEGRADO)
+  // 7. DESCARGA LOCAL DE PDF Y ENVÍO POR CORREO CON ADJUNTO PDF
   // ==========================================
   document.querySelectorAll(".btn-descargar-pdf").forEach(btn => {
     btn.addEventListener("click", async (e) => {
@@ -632,7 +632,6 @@ document.addEventListener("DOMContentLoaded", () => {
       const fecha = document.getElementById("fecha-acto")?.value || new Date().toISOString().slice(0, 10);
       const nombrePDF = `Parte_Servicio_Bomba_OHiggins_N${correlativo}_${fecha}.pdf`;
 
-      // Ocultar temporalmente botones y elementos interactivos para el renderizado
       const elementosOcultar = elementoForm.querySelectorAll(".btn, .form-switch, input[type='file'], .list-group, #resultados-busqueda, #resultados-busqueda-cuartel");
       elementosOcultar.forEach(el => el.style.display = "none");
 
@@ -657,9 +656,14 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
+  // ENVÍO AUTOMÁTICO ADJUNTANDO EL DOCUMENTO PDF EN BASE64
   document.querySelectorAll(".btn-enviar-correo").forEach(btn => {
-    btn.addEventListener("click", (e) => {
+    btn.addEventListener("click", async (e) => {
       const botonPresionado = e.currentTarget;
+      const targetId = botonPresionado.getAttribute("data-form");
+      const elementoForm = document.getElementById(targetId);
+
+      if (!elementoForm) return;
 
       const correlativo = document.getElementById("correlativo-cia")?.value || "S-N";
       const fecha = document.getElementById("fecha-acto")?.value || new Date().toISOString().slice(0, 10);
@@ -668,31 +672,26 @@ document.addEventListener("DOMContentLoaded", () => {
       const direccion = document.getElementById("direccion-acto")?.value || "No especificada";
       const observaciones = document.getElementById("observaciones-parte")?.value || "Sin observaciones registradas.";
 
-      // Extraer personal asistente al acto
-      let listaAsistentesText = "";
-      document.querySelectorAll("#tabla-asistentes-cuerpo tr").forEach(tr => {
-        const celdas = tr.querySelectorAll("td");
-        if (celdas.length >= 3) {
-          listaAsistentesText += `- N° ${celdas[0].innerText.trim()}: ${celdas[1].innerText.trim()} (${celdas[2].innerText.trim()})\n`;
-        }
-      });
-      if (!listaAsistentesText) listaAsistentesText = "Sin asistentes registrados.";
-
-      // Extraer personal en cuartel
-      let listaCuartelText = "";
-      document.querySelectorAll("#tabla-cuartel-cuerpo tr").forEach(tr => {
-        const celdas = tr.querySelectorAll("td");
-        if (celdas.length >= 3) {
-          listaCuartelText += `- N° ${celdas[0].innerText.trim()}: ${celdas[1].innerText.trim()} (${celdas[2].innerText.trim()})\n`;
-        }
-      });
-      if (!listaCuartelText) listaCuartelText = "Sin personal en cuartel.";
-
       const textoOriginal = botonPresionado.innerHTML;
-      botonPresionado.innerHTML = "⏳ Enviando parte...";
+      botonPresionado.innerHTML = "⏳ Generando y enviando PDF...";
       botonPresionado.disabled = true;
 
-      const resumenCompleto = `PARTE OFICIAL DE SERVICIO - BOMBA O'HIGGINS
+      // Ocultar elementos interactivos para el PDF
+      const elementosOcultar = elementoForm.querySelectorAll(".btn, .form-switch, input[type='file'], .list-group, #resultados-busqueda, #resultados-busqueda-cuartel");
+      elementosOcultar.forEach(el => el.style.display = "none");
+
+      const opciones = {
+        margin:       [10, 10, 10, 10],
+        image:        { type: 'jpeg', quality: 0.98 },
+        html2canvas:  { scale: 1.5, useCORS: true, logging: false },
+        jsPDF:        { unit: 'mm', format: 'letter', orientation: 'portrait' }
+      };
+
+      try {
+        // Generar el PDF en formato Base64
+        const pdfBase64 = await html2pdf().set(opciones).from(elementoForm).outputPdf('datauristring');
+
+        const resumenTexto = `PARTE OFICIAL DE SERVICIO - BOMBA O'HIGGINS
 --------------------------------------------------
 Correlativo Cía: ${correlativo}
 Fecha: ${fecha}
@@ -700,32 +699,28 @@ Hora: ${hora}
 Clave del Acto: ${clave}
 Dirección: ${direccion}
 
-PERSONAL ASISTENTE AL ACTO:
-${listaAsistentesText}
-PERSONAL REGISTRADO EN CUARTEL:
-${listaCuartelText}
 OBSERVACIONES DEL ACTO:
 ${observaciones}
 --------------------------------------------------
-Primera Compañía de Bomberos "Bomba O'Higgins" - Rancagua`;
+Nota: Se adjunta el informe completo maquetado en archivo PDF.`;
 
-      const parametrosPlantilla = {
-        asunto: `Parte de Servicio N° ${correlativo} - Bomba O'Higgins (${fecha})`,
-        mensaje: resumenCompleto
-      };
+        const parametrosPlantilla = {
+          asunto: `Parte de Servicio N° ${correlativo} - Bomba O'Higgins (${fecha})`,
+          mensaje: resumenTexto,
+          content_pdf: pdfBase64
+        };
 
-      emailjs.send("service_0j6b43d", "template_e631aiq", parametrosPlantilla)
-        .then(() => {
-          alert("✅ Parte de servicio enviado exitosamente con toda la información a partesbombaohiggins@gmail.com");
-        })
-        .catch((error) => {
-          console.error("Error al enviar con EmailJS:", error);
-          alert("⚠️ No se pudo enviar el parte automáticamente. Revisa tu conexión a internet.");
-        })
-        .finally(() => {
-          botonPresionado.innerHTML = textoOriginal;
-          botonPresionado.disabled = false;
-        });
+        await emailjs.send("service_0j6b43d", "template_e631aiq", parametrosPlantilla);
+        alert("✅ Parte de servicio enviado exitosamente con el archivo PDF adjunto a partesbombaohiggins@gmail.com");
+
+      } catch (error) {
+        console.error("Error al procesar o enviar el PDF:", error);
+        alert("⚠️ No se pudo enviar el parte con el PDF adjunto. Verifique su conexión.");
+      } finally {
+        elementosOcultar.forEach(el => el.style.display = "");
+        botonPresionado.innerHTML = textoOriginal;
+        botonPresionado.disabled = false;
+      }
     });
   });
 
