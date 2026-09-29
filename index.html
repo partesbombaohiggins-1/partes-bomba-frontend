@@ -13,6 +13,14 @@
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
   <!-- Estilos Personalizados -->
   <link rel="stylesheet" href="styles.css">
+
+  <!-- Librería EmailJS para envío automático e invisible -->
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+  <script type="text/javascript">
+    (function(){
+      emailjs.init("hGqhN4sinDO17bvix");
+    })();
+  </script>
 </head>
 
 <body class="bg-light min-vh-100 d-flex flex-column">
@@ -914,6 +922,7 @@
 
               <div class="row g-2 align-items-center bg-light p-2 rounded border mt-2">
                 <div class="col-12 col-md-8">
+                  <label for="filtro-voluntario-asistencia" class="visually-hidden">Filtrar voluntario</label>
                   <input type="text" class="form-control form-control-lg" id="filtro-voluntario-asistencia" placeholder="🔍 Filtrar voluntario por nombre o N°..." autocomplete="off">
                 </div>
                 <div class="col-12 col-md-4">
@@ -979,6 +988,8 @@
 
   <!-- JS Bootstrap 5 -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <!-- Dependencia HTML2Canvas requerida por html2pdf -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
   <!-- Librería Generadora de PDF -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
   <!-- Script Principal de la Aplicación -->
