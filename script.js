@@ -658,7 +658,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
-  // ENVÍO DE DATOS TEXTUALES COMPLETOS A EMAILJS
+  // ENVÍO DE DATOS TEXTUALES COMPLETOS A EMAILJS (USA TEMPLATE ID template_e631aiq)
   document.querySelectorAll(".btn-enviar-correo").forEach(btn => {
     btn.addEventListener("click", (e) => {
       const botonPresionado = e.currentTarget;
