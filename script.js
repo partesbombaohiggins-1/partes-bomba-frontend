@@ -614,8 +614,10 @@ document.addEventListener("DOMContentLoaded", () => {
   renderizarListaAsistencia();
 
   // ==========================================
-  // 7. DESCARGA LOCAL DE PDF Y ENVÍO POR CORREO CON ADJUNTO PDF
+  // 7. DESCARGA LOCAL DE PDF Y ENVÍO RECOPILADO POR CORREO
   // ==========================================
+
+  // DESCARGA LOCAL DE ARCHIVO PDF
   document.querySelectorAll(".btn-descargar-pdf").forEach(btn => {
     btn.addEventListener("click", async (e) => {
       const botonPresionado = e.currentTarget;
@@ -647,7 +649,7 @@ document.addEventListener("DOMContentLoaded", () => {
         await html2pdf().set(opciones).from(elementoForm).save();
       } catch (error) {
         console.error("Error al generar PDF:", error);
-        alert("Hubo un detalle al exportar el PDF. También puede presionar Ctrl + P y seleccionar 'Guardar como PDF'.");
+        alert("Ocurrió un inconveniente al generar el PDF. Puede presionar Ctrl + P y elegir 'Guardar como PDF'.");
       } finally {
         elementosOcultar.forEach(el => el.style.display = "");
         botonPresionado.innerHTML = textoOriginal;
@@ -656,71 +658,176 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
-  // ENVÍO AUTOMÁTICO ADJUNTANDO EL DOCUMENTO PDF EN BASE64
+  // ENVÍO AUTOMÁTICO COMPLETO A EMAILJS
   document.querySelectorAll(".btn-enviar-correo").forEach(btn => {
-    btn.addEventListener("click", async (e) => {
+    btn.addEventListener("click", (e) => {
       const botonPresionado = e.currentTarget;
-      const targetId = botonPresionado.getAttribute("data-form");
-      const elementoForm = document.getElementById(targetId);
+      const formId = botonPresionado.getAttribute("data-form");
 
-      if (!elementoForm) return;
+      let reporteEstructurado = "";
+      let correlativoVal = "S-N";
+      let fechaVal = new Date().toISOString().slice(0, 10);
 
-      const correlativo = document.getElementById("correlativo-cia")?.value || "S-N";
-      const fecha = document.getElementById("fecha-acto")?.value || new Date().toISOString().slice(0, 10);
-      const hora = document.getElementById("hora-acto")?.value || "No especificada";
-      const clave = document.getElementById("clave-acto")?.value || "No especificada";
-      const direccion = document.getElementById("direccion-acto")?.value || "No especificada";
-      const observaciones = document.getElementById("observaciones-parte")?.value || "Sin observaciones registradas.";
+      // A. RECOPILACIÓN SECCIÓN 1: INFORME SERVICIO GENERAL
+      if (formId === "pills-general") {
+        correlativoVal = document.getElementById("correlativo-cia")?.value || "S-N";
+        fechaVal = document.getElementById("fecha-acto")?.value || fechaVal;
+        const hora = document.getElementById("hora-acto")?.value || "N/E";
+        const clave = document.getElementById("clave-acto")?.value || "N/E";
+        const direccion = document.getElementById("direccion-acto")?.value || "N/E";
+        const poblacion = document.getElementById("poblacion-villa")?.value || "N/E";
+        const lugarTipo = document.getElementById("lugar-tipo")?.value || "N/E";
+        const construccion = document.getElementById("construccion-tipo")?.value || "N/E";
+
+        let listaAsistentes = "";
+        document.querySelectorAll("#tabla-asistentes-cuerpo tr").forEach(tr => {
+          const celdas = tr.querySelectorAll("td");
+          if (celdas.length >= 3) {
+            listaAsistentes += `- N° ${celdas[0].innerText.trim()}: ${celdas[1].innerText.trim()} (${celdas[2].innerText.trim()})\n`;
+          }
+        });
+
+        let listaCuartel = "";
+        document.querySelectorAll("#tabla-cuartel-cuerpo tr").forEach(tr => {
+          const celdas = tr.querySelectorAll("td");
+          if (celdas.length >= 3) {
+            listaCuartel += `- N° ${celdas[0].innerText.trim()}: ${celdas[1].innerText.trim()} (${celdas[2].innerText.trim()})\n`;
+          }
+        });
+
+        const observaciones = document.getElementById("observaciones-parte")?.value || "Sin observaciones.";
+
+        reportEstructurado = `PARTE OFICIAL DE SERVICIO GENERAL - BOMBA O'HIGGINS
+--------------------------------------------------
+DATOS DEL ACTO:
+• Correlativo Cía: ${correlativoVal} | General: ${document.getElementById("correlativo-gen")?.value || "S-N"}
+• Fecha: ${fechaVal} | Hora: ${hora}
+• Clave del Acto: ${clave}
+• Dirección: ${direccion} (${poblacion})
+
+CARACTERÍSTICAS DEL LUGAR:
+• Lugar: ${lugarTipo} | Construcción: ${construccion}
+• Ocupante Principal: ${document.getElementById("ocupado-por-1")?.value || "N/E"} (RUT: ${document.getElementById("run-ocupante-1")?.value || "N/E"})
+
+INSTITUCIONES Y OFICIALES:
+• Ambulancia / SAMU: ${document.getElementById("amb-procedencia")?.value || "N/E"}
+• Carabineros: ${document.getElementById("carab-patente")?.value || "N/E"}
+• Oficial a Cargo Cía: ${document.getElementById("oficial-rescate-cia")?.value || "N/E"}
+• Oficial a Cargo Cuerpo: ${document.getElementById("oficial-rescate-cuerpo")?.value || "N/E"}
+
+INVESTIGACIÓN Y ORIGEN:
+• Origen: ${document.getElementById("artefacto-origen")?.value || "N/E"} | Causa: ${document.getElementById("causa-fuego")?.value || "N/E"}
+
+PERSONAL ASISTENTE AL ACTO:
+${listaAsistentes || "Sin asistentes registrados."}
+
+PERSONAL EN CUARTEL:
+${listaCuartel || "Sin personal registrado en cuartel."}
+
+OBSERVACIONES / RESUMEN:
+${observaciones}
+--------------------------------------------------`;
+      } 
+      
+      // B. RECOPILACIÓN SECCIÓN 2: RESCATE VEHICULAR
+      else if (formId === "pills-vehicular") {
+        correlativoVal = document.getElementById("correlativo-veh")?.value || "S-N";
+        fechaVal = document.getElementById("fecha-veh")?.value || fechaVal;
+        const hora = document.getElementById("hora-veh")?.value || "N/E";
+        const clave = document.getElementById("clave-vehicular")?.value || "N/E";
+        const direccion = document.getElementById("direccion-veh")?.value || "N/E";
+
+        let listaAsistentes = "";
+        document.querySelectorAll("#tabla-asistentes-rescate-cuerpo tr").forEach(tr => {
+          const celdas = tr.querySelectorAll("td");
+          if (celdas.length >= 3) {
+            listaAsistentes += `- N° ${celdas[0].innerText.trim()}: ${celdas[1].innerText.trim()} (${celdas[2].innerText.trim()})\n`;
+          }
+        });
+
+        const observaciones = document.getElementById("obs-rescate-vehicular")?.value || "Sin observaciones.";
+
+        reportEstructurado = `PARTE OFICIAL DE RESCATE VEHICULAR - BOMBA O'HIGGINS
+--------------------------------------------------
+DATOS DEL RESCATE:
+• Correlativo Cía: ${correlativoVal}
+• Fecha: ${fechaVal} | Hora: ${hora}
+• Clave Rescate: ${clave}
+• Dirección / Ruta: ${direccion}
+
+DATOS VEHÍCULO Y CONDUCTOR:
+• Conductor: ${document.getElementById("v1-nombre")?.value || "N/E"} (RUT: ${document.getElementById("v1-ci")?.value || "N/E"})
+• Vehículo: ${document.getElementById("v1-marca")?.value || "N/E"} ${document.getElementById("v1-modelo")?.value || ""} | Patente: ${document.getElementById("v1-patente")?.value || "N/E"}
+• Lesionados Trasladados a: ${document.getElementById("v1-derivado")?.value || "N/E"}
+
+MATERIAL MENOR UTILIZADO:
+• Collares: ${document.getElementById("mat-collares")?.value || "0"} | Tablas: ${document.getElementById("mat-tablas")?.value || "0"} | Chalecos: ${document.getElementById("mat-chalecos")?.value || "0"}
+
+PERSONAL ASISTENTE AL RESCATE:
+${listaAsistentes || "Sin asistentes registrados."}
+
+OBSERVACIONES DEL RESCATE:
+${observaciones}
+--------------------------------------------------`;
+      } 
+      
+      // C. RECOPILACIÓN SECCIÓN 3: ASISTENCIA
+      else if (formId === "pills-asistencia") {
+        fechaVal = document.getElementById("fecha-citacion-asistencia")?.value || fechaVal;
+        const citacion = document.getElementById("tipo-citacion-asistencia")?.value || "N/E";
+        const oficialCargo = document.getElementById("oficial-a-cargo-asistencia")?.value || "N/E";
+
+        let presentesText = "";
+        let countPresentes = 0;
+        Object.keys(registroAsistencia).forEach(num => {
+          if (registroAsistencia[num] === true) {
+            const vol = voluntariosCompania.find(v => v.num == num);
+            if (vol) {
+              presentesText += `- N° ${vol.num}: ${vol.nombre} (${vol.tipo})\n`;
+              countPresentes++;
+            }
+          }
+        });
+
+        const observaciones = document.getElementById("obs-asistencia-general")?.value || "Sin observaciones.";
+
+        reportEstructurado = `CONTROL OFICIAL DE ASISTENCIA - BOMBA O'HIGGINS
+--------------------------------------------------
+DATOS DE LA CITACIÓN:
+• Tipo de Actividad: ${citacion}
+• Fecha: ${fechaVal} | Hora Inicio: ${document.getElementById("hora-inicio-asistencia")?.value || "N/E"}
+• Oficial a Cargo: ${oficialCargo}
+• Total Presentes: ${countPresentes} de ${voluntariosCompania.length} Voluntarios
+
+LISTA DE VOLUNTARIOS PRESENTES:
+${presentesText || "Sin voluntarios marcados como presentes."}
+
+OBSERVACIONES:
+${observaciones}
+--------------------------------------------------`;
+      }
 
       const textoOriginal = botonPresionado.innerHTML;
-      botonPresionado.innerHTML = "⏳ Generando y enviando PDF...";
+      botonPresionado.innerHTML = "⏳ Enviando parte...";
       botonPresionado.disabled = true;
 
-      // Ocultar elementos interactivos para el PDF
-      const elementosOcultar = elementoForm.querySelectorAll(".btn, .form-switch, input[type='file'], .list-group, #resultados-busqueda, #resultados-busqueda-cuartel");
-      elementosOcultar.forEach(el => el.style.display = "none");
-
-      const opciones = {
-        margin:       [10, 10, 10, 10],
-        image:        { type: 'jpeg', quality: 0.98 },
-        html2canvas:  { scale: 1.5, useCORS: true, logging: false },
-        jsPDF:        { unit: 'mm', format: 'letter', orientation: 'portrait' }
+      const parametrosPlantilla = {
+        asunto: `Parte de Servicio N° ${correlativoVal} - Bomba O'Higgins (${fechaVal})`,
+        mensaje: reporteEstructurado
       };
 
-      try {
-        // Generar el PDF en formato Base64
-        const pdfBase64 = await html2pdf().set(opciones).from(elementoForm).outputPdf('datauristring');
-
-        const resumenTexto = `PARTE OFICIAL DE SERVICIO - BOMBA O'HIGGINS
---------------------------------------------------
-Correlativo Cía: ${correlativo}
-Fecha: ${fecha}
-Hora: ${hora}
-Clave del Acto: ${clave}
-Dirección: ${direccion}
-
-OBSERVACIONES DEL ACTO:
-${observaciones}
---------------------------------------------------
-Nota: Se adjunta el informe completo maquetado en archivo PDF.`;
-
-        const parametrosPlantilla = {
-          asunto: `Parte de Servicio N° ${correlativo} - Bomba O'Higgins (${fecha})`,
-          mensaje: resumenTexto,
-          content_pdf: pdfBase64
-        };
-
-        await emailjs.send("service_0j6b43d", "template_e631aiq", parametrosPlantilla);
-        alert("✅ Parte de servicio enviado exitosamente con el archivo PDF adjunto a partesbombaohiggins@gmail.com");
-
-      } catch (error) {
-        console.error("Error al procesar o enviar el PDF:", error);
-        alert("⚠️ No se pudo enviar el parte con el PDF adjunto. Verifique su conexión.");
-      } finally {
-        elementosOcultar.forEach(el => el.style.display = "");
-        botonPresionado.innerHTML = textoOriginal;
-        botonPresionado.disabled = false;
-      }
+      emailjs.send("service_0j6b43d", "vhke1o4", parametrosPlantilla)
+        .then(() => {
+          alert("✅ Parte de servicio enviado exitosamente con la información completa a partesbombaohiggins@gmail.com");
+        })
+        .catch((error) => {
+          console.error("Error al enviar con EmailJS:", error);
+          alert("⚠️ No se pudo enviar el parte automáticamente. Verifique su conexión.");
+        })
+        .finally(() => {
+          botonPresionado.innerHTML = textoOriginal;
+          botonPresionado.disabled = false;
+        });
     });
   });
 
