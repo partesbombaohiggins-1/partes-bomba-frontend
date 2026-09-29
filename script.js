@@ -811,7 +811,7 @@ ${observaciones}
         mensaje: reporteEstructurado
       };
 
-      emailjs.send("service_0j6b43d", "vhke1o4", parametrosPlantilla)
+      emailjs.send("service_0j6b43d", "template_e631aiq", parametrosPlantilla)
         .then(() => {
           alert("✅ Parte de servicio enviado exitosamente con la información completa a partesbombaohiggins@gmail.com");
         })
