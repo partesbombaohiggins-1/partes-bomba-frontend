@@ -392,7 +392,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const switchCuartelRescate = document.getElementById("switch-en-cuartel-rescate");
   const contenedorCuartelRescate = document.getElementById("contenedor-en-cuartel-rescate");
   const inputCuartelRescate = document.getElementById("buscar-bombero-cuartel-rescate");
-  const resultadosCuartelRescate = document.getElementById("resultados-busqueda-rescate");
+  const resultadosCuartelRescate = document.getElementById("resultados-busqueda-cuartel-rescate");
   const tablaCuartelRescateCuerpo = document.getElementById("tabla-cuartel-rescate-cuerpo");
   let personalCuartelRescateAgregado = [];
 
@@ -612,11 +612,10 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   renderizarListaAsistencia();
-// ==========================================
-  // 7. DESCARGA PDF Y ENVÍO POR CORREO (100% FUNCIONAL)
-  // ==========================================
 
-  // DESCARGA DE PDF DIRECTA Y SEGURA
+  // ==========================================
+  // 7. DESCARGA PDF Y ENVÍO POR CORREO (EMAILJS INTEGRADO)
+  // ==========================================
   document.querySelectorAll(".btn-descargar-pdf").forEach(btn => {
     btn.addEventListener("click", async (e) => {
       const botonPresionado = e.currentTarget;
@@ -633,7 +632,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const fecha = document.getElementById("fecha-acto")?.value || new Date().toISOString().slice(0, 10);
       const nombrePDF = `Parte_Servicio_Bomba_OHiggins_N${correlativo}_${fecha}.pdf`;
 
-      // Ocultar temporalmente botones y elementos interactivos que rompen el canvas
+      // Ocultar temporalmente botones y elementos interactivos para el renderizado
       const elementosOcultar = elementoForm.querySelectorAll(".btn, .form-switch, input[type='file'], .list-group, #resultados-busqueda, #resultados-busqueda-cuartel");
       elementosOcultar.forEach(el => el.style.display = "none");
 
@@ -651,7 +650,6 @@ document.addEventListener("DOMContentLoaded", () => {
         console.error("Error al generar PDF:", error);
         alert("Hubo un detalle al exportar el PDF. También puede presionar Ctrl + P y seleccionar 'Guardar como PDF'.");
       } finally {
-        // Restaurar la visibilidad de los botones en pantalla
         elementosOcultar.forEach(el => el.style.display = "");
         botonPresionado.innerHTML = textoOriginal;
         botonPresionado.disabled = false;
@@ -659,7 +657,6 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
-  // ENVÍO DE CORREO AUTOMÁTICO VÍA EMAILJS
   document.querySelectorAll(".btn-enviar-correo").forEach(btn => {
     btn.addEventListener("click", (e) => {
       const botonPresionado = e.currentTarget;
@@ -717,7 +714,6 @@ Primera Compañía de Bomberos "Bomba O'Higgins" - Rancagua`;
         mensaje: resumenCompleto
       };
 
-      // Envío usando tu Service ID y tu Template ID real
       emailjs.send("service_0j6b43d", "template_e631aiq", parametrosPlantilla)
         .then(() => {
           alert("✅ Parte de servicio enviado exitosamente con toda la información a partesbombaohiggins@gmail.com");
@@ -732,3 +728,5 @@ Primera Compañía de Bomberos "Bomba O'Higgins" - Rancagua`;
         });
     });
   });
+
+});
