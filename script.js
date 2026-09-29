@@ -613,10 +613,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
   renderizarListaAsistencia();
 // ==========================================
-  // 7. DESCARGA PDF Y ENVÍO POR CORREO (CORREGIDO)
+  // 7. DESCARGA PDF Y ENVÍO POR CORREO (100% FUNCIONAL)
   // ==========================================
 
-  // DESCARGA DE PDF
+  // DESCARGA DE PDF DIRECTA Y SEGURA
   document.querySelectorAll(".btn-descargar-pdf").forEach(btn => {
     btn.addEventListener("click", async (e) => {
       const botonPresionado = e.currentTarget;
@@ -633,50 +633,33 @@ document.addEventListener("DOMContentLoaded", () => {
       const fecha = document.getElementById("fecha-acto")?.value || new Date().toISOString().slice(0, 10);
       const nombrePDF = `Parte_Servicio_Bomba_OHiggins_N${correlativo}_${fecha}.pdf`;
 
-      // Preparar clon para renderizado limpio en PDF
-      const clon = elementoForm.cloneNode(true);
-      
-      // Remover botones, switches y buscadores que bloquean html2pdf
-      clon.querySelectorAll(".btn, .form-switch, input[type='file'], .list-group, #resultados-busqueda").forEach(el => {
-        el.remove();
-      });
-
-      // Asegurar visibilidad completa de tablas
-      clon.querySelectorAll(".table-responsive").forEach(el => {
-        el.style.maxHeight = "none";
-        el.style.overflow = "visible";
-      });
-
-      const contenedorTemporal = document.createElement("div");
-      contenedorTemporal.style.position = "absolute";
-      contenedorTemporal.style.left = "-9999px";
-      contenedorTemporal.style.top = "0";
-      contenedorTemporal.style.width = "750px";
-      contenedorTemporal.appendChild(clon);
-      document.body.appendChild(contenedorTemporal);
+      // Ocultar temporalmente botones y elementos interactivos que rompen el canvas
+      const elementosOcultar = elementoForm.querySelectorAll(".btn, .form-switch, input[type='file'], .list-group, #resultados-busqueda, #resultados-busqueda-cuartel");
+      elementosOcultar.forEach(el => el.style.display = "none");
 
       const opciones = {
         margin:       [10, 10, 10, 10],
         filename:     nombrePDF,
         image:        { type: 'jpeg', quality: 0.98 },
-        html2canvas:  { scale: 2, useCORS: true, logging: false },
+        html2canvas:  { scale: 2, useCORS: true, logging: false, scrollY: 0 },
         jsPDF:        { unit: 'mm', format: 'letter', orientation: 'portrait' }
       };
 
       try {
-        await html2pdf().set(opciones).from(clon).save();
+        await html2pdf().set(opciones).from(elementoForm).save();
       } catch (error) {
         console.error("Error al generar PDF:", error);
-        alert("Hubo un error al generar el PDF. Asegúrese de que las imágenes estén cargadas correctamente.");
+        alert("Hubo un detalle al exportar el PDF. También puede presionar Ctrl + P y seleccionar 'Guardar como PDF'.");
       } finally {
-        document.body.removeChild(contenedorTemporal);
+        // Restaurar la visibilidad de los botones en pantalla
+        elementosOcultar.forEach(el => el.style.display = "");
         botonPresionado.innerHTML = textoOriginal;
         botonPresionado.disabled = false;
       }
     });
   });
 
-  // ENVÍO DE CORREO COMPLETO CON EMAILJS
+  // ENVÍO DE CORREO AUTOMÁTICO VÍA EMAILJS
   document.querySelectorAll(".btn-enviar-correo").forEach(btn => {
     btn.addEventListener("click", (e) => {
       const botonPresionado = e.currentTarget;
@@ -686,9 +669,9 @@ document.addEventListener("DOMContentLoaded", () => {
       const hora = document.getElementById("hora-acto")?.value || "No especificada";
       const clave = document.getElementById("clave-acto")?.value || "No especificada";
       const direccion = document.getElementById("direccion-acto")?.value || "No especificada";
-      const observaciones = document.getElementById("observaciones-parte")?.value || "Sin observaciones.";
+      const observaciones = document.getElementById("observaciones-parte")?.value || "Sin observaciones registradas.";
 
-      // Compilar lista de asistentes agregados a la tabla
+      // Extraer personal asistente al acto
       let listaAsistentesText = "";
       document.querySelectorAll("#tabla-asistentes-cuerpo tr").forEach(tr => {
         const celdas = tr.querySelectorAll("td");
@@ -698,7 +681,7 @@ document.addEventListener("DOMContentLoaded", () => {
       });
       if (!listaAsistentesText) listaAsistentesText = "Sin asistentes registrados.";
 
-      // Compilar lista de personal en cuartel
+      // Extraer personal en cuartel
       let listaCuartelText = "";
       document.querySelectorAll("#tabla-cuartel-cuerpo tr").forEach(tr => {
         const celdas = tr.querySelectorAll("td");
@@ -712,8 +695,7 @@ document.addEventListener("DOMContentLoaded", () => {
       botonPresionado.innerHTML = "⏳ Enviando parte...";
       botonPresionado.disabled = true;
 
-      // Resumen completo de la emergencia
-      const cuerpoDetallado = `DETALLES DEL PARTE DE SERVICIO
+      const resumenCompleto = `PARTE OFICIAL DE SERVICIO - BOMBA O'HIGGINS
 --------------------------------------------------
 Correlativo Cía: ${correlativo}
 Fecha: ${fecha}
@@ -723,27 +705,26 @@ Dirección: ${direccion}
 
 PERSONAL ASISTENTE AL ACTO:
 ${listaAsistentesText}
-
 PERSONAL REGISTRADO EN CUARTEL:
 ${listaCuartelText}
-
-OBSERVACIONES / RESUMEN:
+OBSERVACIONES DEL ACTO:
 ${observaciones}
 --------------------------------------------------
-Primera Compañía Bomba O'Higgins - Rancagua`;
+Primera Compañía de Bomberos "Bomba O'Higgins" - Rancagua`;
 
       const parametrosPlantilla = {
         asunto: `Parte de Servicio N° ${correlativo} - Bomba O'Higgins (${fecha})`,
-        mensaje: cuerpoDetallado
+        mensaje: resumenCompleto
       };
 
-      emailjs.send("service_0j6b43d", "template_contact", parametrosPlantilla)
+      // Envío usando tu Service ID y tu Template ID real
+      emailjs.send("service_0j6b43d", "template_e631aiq", parametrosPlantilla)
         .then(() => {
-          alert("✅ Parte de servicio enviado con éxito a partesbombaohiggins@gmail.com con toda la información detallada.");
+          alert("✅ Parte de servicio enviado exitosamente con toda la información a partesbombaohiggins@gmail.com");
         })
         .catch((error) => {
-          console.error("Error al enviar el correo con EmailJS:", error);
-          alert("⚠️ No se pudo enviar el parte automáticamente. Intente nuevamente.");
+          console.error("Error al enviar con EmailJS:", error);
+          alert("⚠️ No se pudo enviar el parte automáticamente. Revisa tu conexión a internet.");
         })
         .finally(() => {
           botonPresionado.innerHTML = textoOriginal;
