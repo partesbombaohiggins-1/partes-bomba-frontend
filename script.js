@@ -612,19 +612,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
   renderizarListaAsistencia();
 
+ // ==========================================
+  // 7. DESCARGA PDF Y ENVÍO POR CORREO (CORREGIDO)
   // ==========================================
-  // 7. DESCARGA PDF Y ENVÍO POR CORREO
-  // ==========================================
-  function obtenerOpcionesPDF(nombreArchivo) {
-    return {
-      margin:       [10, 10, 10, 10],
-      filename:     `${nombreArchivo}.pdf`,
-      image:        { type: 'jpeg', quality: 0.98 },
-      html2canvas:  { scale: 2, useCORS: true, logging: false, scrollY: 0 },
-      jsPDF:        { unit: 'mm', format: 'letter', orientation: 'portrait' }
-    };
-  }
 
+  // CORRECCIÓN 1: Generación directa de PDF sin bloqueo por imágenes ni clones
   document.querySelectorAll(".btn-descargar-pdf").forEach(btn => {
     btn.addEventListener("click", async (e) => {
       const botonPresionado = e.currentTarget;
@@ -637,47 +629,34 @@ document.addEventListener("DOMContentLoaded", () => {
       botonPresionado.innerHTML = "⏳ Generando PDF...";
       botonPresionado.disabled = true;
 
-      // Clonar nodo para evitar ocultar el botón en la pantalla activa
-      const clon = elementoForm.cloneNode(true);
-      clon.classList.add("modo-pdf");
-
-      clon.querySelectorAll(".table-responsive").forEach(el => {
-        el.style.maxHeight = "none";
-        el.style.overflow = "visible";
-      });
-
-      clon.querySelectorAll(".btn, .form-switch, input[type='file'], .list-group").forEach(el => {
-        el.style.display = "none";
-      });
-
-      const contenedorTemporal = document.createElement("div");
-      contenedorTemporal.style.position = "absolute";
-      contenedorTemporal.style.left = "-9999px";
-      contenedorTemporal.style.top = "0";
-      contenedorTemporal.style.width = "800px";
-      contenedorTemporal.appendChild(clon);
-      document.body.appendChild(contenedorTemporal);
-
       const correlativo = document.getElementById("correlativo-cia")?.value || "S-N";
       const fecha = document.getElementById("fecha-acto")?.value || new Date().toISOString().slice(0, 10);
-      const nombrePDF = `Parte_Servicio_Bomba_OHiggins_N${correlativo}_${fecha}`;
+      const nombrePDF = `Parte_Servicio_Bomba_OHiggins_N${correlativo}_${fecha}.pdf`;
+
+      // Opciones de exportación compatibles con GitHub Pages
+      const opciones = {
+        margin:       [10, 10, 10, 10],
+        filename:     nombrePDF,
+        image:        { type: 'jpeg', quality: 0.95 },
+        html2canvas:  { scale: 1.5, useCORS: true, logging: false },
+        jsPDF:        { unit: 'mm', format: 'letter', orientation: 'portrait' }
+      };
 
       try {
-        await html2pdf().set(obtenerOpcionesPDF(nombrePDF)).from(clon).save();
+        await html2pdf().set(opciones).from(elementoForm).save();
       } catch (error) {
-        console.error("Error al generar PDF:", error);
-        alert("Hubo un error al generar el archivo PDF. Intente nuevamente.");
+        console.error("Error detallado al generar PDF:", error);
+        alert("No se pudo exportar el PDF directamente. Intente usar Ctrl + P para guardar como PDF.");
       } finally {
-        document.body.removeChild(contenedorTemporal);
         botonPresionado.innerHTML = textoOriginal;
         botonPresionado.disabled = false;
       }
     });
   });
 
+  // CORRECCIÓN 2: Apertura directa de Gmail Web con borrador precargado
   document.querySelectorAll(".btn-enviar-correo").forEach(btn => {
     btn.addEventListener("click", () => {
-      // Correo oficial configurado
       const correoDestino = "partesbombaohiggins@gmail.com";
       const correlativo = document.getElementById("correlativo-cia")?.value || "S-N";
       const fecha = document.getElementById("fecha-acto")?.value || new Date().toISOString().slice(0, 10);
@@ -685,8 +664,8 @@ document.addEventListener("DOMContentLoaded", () => {
       const asunto = encodeURIComponent(`Parte de Servicio N° ${correlativo} - Bomba O'Higgins (${fecha})`);
       const cuerpo = encodeURIComponent(`Estimados,\n\nSe adjunta la información oficial del parte de servicio correspondiente a la fecha ${fecha}.\n\nAtentamente,\nPrimera Compañía Bomba O'Higgins - Rancagua.`);
 
-      window.location.href = `mailto:${correoDestino}?subject=${asunto}&body=${cuerpo}`;
+      // Abre una pestaña nueva en el navegador con el borrador de Gmail listo para enviar
+      const urlGmail = `https://mail.google.com/mail/?view=cm&fs=1&to=${correoDestino}&su=${asunto}&body=${cuerpo}`;
+      window.open(urlGmail, '_blank');
     });
   });
-
-});
