@@ -57,30 +57,25 @@ const voluntariosCompania = [
   { num: 55, nombre: "Olguín Vargas Sergio", tipo: "VA" },
   { num: 56, nombre: "Rebolledo Droguett Andrés", tipo: "VA" },
   { num: 57, nombre: "Bahamondes Conteras Carlos", tipo: "VA" },
-  { num: 58, nombre: "Andrade Guajardo Gabriel", tipo: "VA" },
-  { num: 59, nombre: "Escalona Valenzuela Francesca", tipo: "VA" },
-  { num: 60, nombre: "Giadach Castillo Cristian", tipo: "VE" },
-  { num: 61, nombre: "Bahamondes Contreras Trinidad", tipo: "VA" },
-  { num: 62, nombre: "Serrano Vega Matías", tipo: "VA" },
-  { num: 63, nombre: "Guzmán Céspedes Fabián Eliú", tipo: "VA" },
-  { num: 64, nombre: "Matamala Pérez Ignacio Antonio", tipo: "VA" },
-  { num: 65, nombre: "Riquelme Lira Felipe Ignacio", tipo: "VA" },
-  { num: 66, nombre: "Aravena Quijada Felipe Ignacio", tipo: "VA" },
-  { num: 67, nombre: "Aravena Correa Martina", tipo: "VA" },
-  { num: 68, nombre: "Méndez Vidal Cristian Felipe", tipo: "VA" },
-  { num: 69, nombre: "Guzmán Céspedes Christian", tipo: "VA" },
-  { num: 70, nombre: "Plaza Vejar Patricio", tipo: "VE" },
-  { num: 71, nombre: "Farias Aristegui Benjamín", tipo: "VA" },
-  { num: 72, nombre: "Pizzoleo Vergara Catalina", tipo: "VA" },
-  { num: 73, nombre: "Ríos Gálvez Benjamín Andrés", tipo: "VA" },
-  { num: 74, nombre: "Zamora Pérez Israel Alejandro", tipo: "VA" },
-  { num: 75, nombre: "Maldonado Carreño Martin", tipo: "VA" },
-  { num: 76, nombre: "Gaete Pávez Kimberly", tipo: "VA" },
-  { num: 77, nombre: "Lafitte Lafitte Pathrick", tipo: "VA" },
-  { num: 78, nombre: "Villar de la Barra Maximiliano", tipo: "VA" },
-  { num: 79, nombre: "Calderón Cabezas Anahi", tipo: "VA" },
-  { num: 80, nombre: "Schenke Zúñiga Jorge", tipo: "VE" },
-  { num: 81, nombre: "Arriagada Contreras Joaquin", tipo: "VA" }
+  { num: 58, nombre: "Escalona Valenzuela Francesca", tipo: "VA" },
+  { num: 59, nombre: "Giadach Castillo Cristian", tipo: "VE" },
+  { num: 60, nombre: "Serrano Vega Matías", tipo: "VA" },
+  { num: 61, nombre: "Guzmán Céspedes Fabián Eliú", tipo: "VA" },
+  { num: 62, nombre: "Matamala Pérez Ignacio Antonio", tipo: "VA" },
+  { num: 63, nombre: "Riquelme Lira Felipe Ignacio", tipo: "VA" },
+  { num: 64, nombre: "Aravena Quijada Felipe Ignacio", tipo: "VA" },
+  { num: 65, nombre: "Aravena Correa Martina", tipo: "VA" },
+  { num: 66, nombre: "Méndez Vidal Cristian Felipe", tipo: "VA" },
+  { num: 67, nombre: "Guzmán Céspedes Christian", tipo: "VA" },
+  { num: 68, nombre: "Plaza Vejar Patricio", tipo: "VE" },
+  { num: 69, nombre: "Farias Aristegui Benjamín", tipo: "VA" },
+  { num: 70, nombre: "Pizzoleo Vergara Catalina", tipo: "VA" },
+  { num: 71, nombre: "Ríos Gálvez Benjamín Andrés", tipo: "VA" },
+  { num: 72, nombre: "Zamora Pérez Israel Alejandro", tipo: "VA" },
+  { num: 73, nombre: "Gaete Pávez Kimberly", tipo: "VA" },
+  { num: 74, nombre: "Villar de la Barra Maximiliano", tipo: "VA" },
+  { num: 75, nombre: "Schenke Zúñiga Jorge", tipo: "VE" },
+  { num: 76, nombre: "Arriagada Contreras Joaquin", tipo: "VA" }
 ];
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -132,10 +127,11 @@ document.addEventListener("DOMContentLoaded", () => {
         return;
       }
 
-      const filtrados = voluntariosCompania.filter(vol => 
-        normalizarTexto(vol.nombre).includes(busqueda) || 
-        vol.num.toString() === busqueda
-      );
+      const filtrados = voluntariosCompania.filter(vol => {
+        if (!vol || !vol.nombre) return false;
+        const numStr = vol.num ? vol.num.toString() : "";
+        return normalizarTexto(vol.nombre).includes(busqueda) || numStr === busqueda;
+      });
 
       if (filtrados.length === 0) {
         contenedorResultados.innerHTML = `<div class="list-group-item text-muted p-2 bg-white">No hay coincidencias</div>`;
@@ -232,10 +228,11 @@ document.addEventListener("DOMContentLoaded", () => {
         return;
       }
 
-      const filtrados = voluntariosCompania.filter(vol => 
-        normalizarTexto(vol.nombre).includes(busqueda) || 
-        vol.num.toString() === busqueda
-      );
+      const filtrados = voluntariosCompania.filter(vol => {
+        if (!vol || !vol.nombre) return false;
+        const numStr = vol.num ? vol.num.toString() : "";
+        return normalizarTexto(vol.nombre).includes(busqueda) || numStr === busqueda;
+      });
 
       if (filtrados.length === 0) {
         resultadosCuartel.innerHTML = `<div class="list-group-item text-muted p-2 bg-white">No hay coincidencias</div>`;
@@ -320,10 +317,11 @@ document.addEventListener("DOMContentLoaded", () => {
         return;
       }
 
-      const filtrados = voluntariosCompania.filter(vol => 
-        normalizarTexto(vol.nombre).includes(busqueda) || 
-        vol.num.toString() === busqueda
-      );
+      const filtrados = voluntariosCompania.filter(vol => {
+        if (!vol || !vol.nombre) return false;
+        const numStr = vol.num ? vol.num.toString() : "";
+        return normalizarTexto(vol.nombre).includes(busqueda) || numStr === busqueda;
+      });
 
       if (filtrados.length === 0) {
         resultadosRescate.innerHTML = `<div class="list-group-item text-muted p-2 bg-white">No hay coincidencias</div>`;
@@ -394,7 +392,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const switchCuartelRescate = document.getElementById("switch-en-cuartel-rescate");
   const contenedorCuartelRescate = document.getElementById("contenedor-en-cuartel-rescate");
   const inputCuartelRescate = document.getElementById("buscar-bombero-cuartel-rescate");
-  const resultadosCuartelRescate = document.getElementById("resultados-busqueda-cuartel-rescate");
+  const resultadosCuartelRescate = document.getElementById("resultados-busqueda-rescate");
   const tablaCuartelRescateCuerpo = document.getElementById("tabla-cuartel-rescate-cuerpo");
   let personalCuartelRescateAgregado = [];
 
@@ -418,10 +416,11 @@ document.addEventListener("DOMContentLoaded", () => {
         return;
       }
 
-      const filtrados = voluntariosCompania.filter(vol => 
-        normalizarTexto(vol.nombre).includes(busqueda) || 
-        vol.num.toString() === busqueda
-      );
+      const filtrados = voluntariosCompania.filter(vol => {
+        if (!vol || !vol.nombre) return false;
+        const numStr = vol.num ? vol.num.toString() : "";
+        return normalizarTexto(vol.nombre).includes(busqueda) || numStr === busqueda;
+      });
 
       if (filtrados.length === 0) {
         resultadosCuartelRescate.innerHTML = `<div class="list-group-item text-muted p-2 bg-white">No hay coincidencias</div>`;
@@ -530,7 +529,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // ==========================================
-  // 6. SECCIÓN 3: CONTROL ASISTENCIA COMPLETO (81 BOMBEROS)
+  // 6. SECCIÓN 3: CONTROL ASISTENCIA COMPLETO
   // ==========================================
   const tablaAsistencia = document.getElementById("tabla-asistencia-completa-cuerpo");
   const filtroAsistencia = document.getElementById("filtro-voluntario-asistencia");
@@ -548,9 +547,11 @@ document.addEventListener("DOMContentLoaded", () => {
     const textoFiltro = filtroAsistencia ? normalizarTexto(filtroAsistencia.value) : "";
     tablaAsistencia.innerHTML = "";
 
-    const filtrados = voluntariosCompania.filter(vol => 
-      normalizarTexto(vol.nombre).includes(textoFiltro) || vol.num.toString() === textoFiltro
-    );
+    const filtrados = voluntariosCompania.filter(vol => {
+      if (!vol || !vol.nombre) return false;
+      const numStr = vol.num ? vol.num.toString() : "";
+      return normalizarTexto(vol.nombre).includes(textoFiltro) || numStr === textoFiltro;
+    });
 
     if (filtrados.length === 0) {
       tablaAsistencia.innerHTML = `<tr><td colspan="4" class="text-center text-muted py-4">No se encontró ningún voluntario con ese criterio.</td></tr>`;
@@ -612,11 +613,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
   renderizarListaAsistencia();
 
- // ==========================================
-  // 7. DESCARGA PDF Y ENVÍO POR CORREO (CORREGIDO)
   // ==========================================
-
-  // CORRECCIÓN 1: Generación directa de PDF sin bloqueo por imágenes ni clones
+  // 7. DESCARGA PDF Y ENVÍO POR CORREO (EMAILJS INTEGRADO)
+  // ==========================================
   document.querySelectorAll(".btn-descargar-pdf").forEach(btn => {
     btn.addEventListener("click", async (e) => {
       const botonPresionado = e.currentTarget;
@@ -633,7 +632,6 @@ document.addEventListener("DOMContentLoaded", () => {
       const fecha = document.getElementById("fecha-acto")?.value || new Date().toISOString().slice(0, 10);
       const nombrePDF = `Parte_Servicio_Bomba_OHiggins_N${correlativo}_${fecha}.pdf`;
 
-      // Opciones de exportación compatibles con GitHub Pages
       const opciones = {
         margin:       [10, 10, 10, 10],
         filename:     nombrePDF,
@@ -654,18 +652,41 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
-  // CORRECCIÓN 2: Apertura directa de Gmail Web con borrador precargado
   document.querySelectorAll(".btn-enviar-correo").forEach(btn => {
-    btn.addEventListener("click", () => {
-      const correoDestino = "partesbombaohiggins@gmail.com";
+    btn.addEventListener("click", (e) => {
+      const botonPresionado = e.currentTarget;
+      const targetId = botonPresionado.getAttribute("data-form");
+      const elementoForm = document.getElementById(targetId);
+
+      if (!elementoForm) return;
+
       const correlativo = document.getElementById("correlativo-cia")?.value || "S-N";
       const fecha = document.getElementById("fecha-acto")?.value || new Date().toISOString().slice(0, 10);
-      
-      const asunto = encodeURIComponent(`Parte de Servicio N° ${correlativo} - Bomba O'Higgins (${fecha})`);
-      const cuerpo = encodeURIComponent(`Estimados,\n\nSe adjunta la información oficial del parte de servicio correspondiente a la fecha ${fecha}.\n\nAtentamente,\nPrimera Compañía Bomba O'Higgins - Rancagua.`);
+      const observaciones = document.getElementById("observaciones-parte")?.value || "Sin observaciones adicionales.";
 
-      // Abre una pestaña nueva en el navegador con el borrador de Gmail listo para enviar
-      const urlGmail = `https://mail.google.com/mail/?view=cm&fs=1&to=${correoDestino}&su=${asunto}&body=${cuerpo}`;
-      window.open(urlGmail, '_blank');
+      const textoOriginal = botonPresionado.innerHTML;
+      botonPresionado.innerHTML = "⏳ Enviando parte...";
+      botonPresionado.disabled = true;
+
+      const parametrosPlantilla = {
+        asunto: `Parte de Servicio N° ${correlativo} - Bomba O'Higgins (${fecha})`,
+        mensaje: `Se ha emitido un nuevo reporte oficial.\n\nFecha: ${fecha}\nCorrelativo Cía: ${correlativo}\nObservaciones: ${observaciones}`
+      };
+
+      // Usa tu Service ID activo 'service_0j6b43d' y el Template ID configurado en EmailJS
+      emailjs.send("service_0j6b43d", "template_contact", parametrosPlantilla)
+        .then(() => {
+          alert("✅ Parte de servicio enviado con éxito a partesbombaohiggins@gmail.com");
+        })
+        .catch((error) => {
+          console.error("Error al enviar el correo con EmailJS:", error);
+          alert("⚠️ No se pudo enviar el parte automáticamente. Verifica tu conexión o credenciales de EmailJS.");
+        })
+        .finally(() => {
+          botonPresionado.innerHTML = textoOriginal;
+          botonPresionado.disabled = false;
+        });
     });
   });
+
+});
