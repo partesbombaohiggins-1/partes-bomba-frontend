@@ -659,9 +659,16 @@ document.addEventListener("DOMContentLoaded", () => {
       const fecha = document.getElementById("fecha-acto")?.value || new Date().toISOString().slice(0, 10);
       const nombrePDF = `Parte_Servicio_Bomba_OHiggins_N${correlativo}_${fecha}.pdf`;
 
-      // Ocultar botones, menús flotantes e imágenes para evitar Unsupported Image Type
-      const elementosOcultar = elementoForm.querySelectorAll(".btn, .form-switch, input[type='file'], .list-group, #resultados-busqueda, #resultados-busqueda-cuartel, img");
-      elementosOcultar.forEach(el => el.style.display = "none");
+      // Crear un clon del elemento HTML sin imágenes para evitar Unsupported Image Type en html2canvas
+      const clonElemento = elementoForm.cloneNode(true);
+      
+      // Ocultar botones, switches y listas desplegables en el clon
+      clonElemento.querySelectorAll(".btn, .form-switch, input[type='file'], .list-group, #resultados-busqueda, #resultados-busqueda-cuartel").forEach(el => {
+        el.style.display = "none";
+      });
+
+      // Eliminar cualquier etiqueta <img> dentro del clon
+      clonElemento.querySelectorAll("img").forEach(img => img.remove());
 
       const opciones = {
         margin:       [10, 10, 10, 10],
@@ -672,12 +679,11 @@ document.addEventListener("DOMContentLoaded", () => {
       };
 
       try {
-        await html2pdf().set(opciones).from(elementoForm).save();
+        await html2pdf().set(opciones).from(clonElemento).save();
       } catch (error) {
         console.error("Error al generar PDF:", error);
         alert("Ocurrió un inconveniente al generar el PDF. Intente de nuevo.");
       } finally {
-        elementosOcultar.forEach(el => el.style.display = "");
         botonPresionado.innerHTML = textoOriginal;
         botonPresionado.disabled = false;
       }
