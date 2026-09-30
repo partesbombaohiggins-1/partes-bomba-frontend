@@ -471,137 +471,118 @@ document.addEventListener("DOMContentLoaded", () => {
   renderizarListaAsistencia();
 
   // ==========================================
-  // 6. GENERADOR DE PDF OFICIAL LIMPIO Y COMPATIBLE
+  // 6. GENERADOR DE PDF MEDIANTE IMPRESIÓN OFICIAL DEL NAVEGADOR
   // ==========================================
   document.querySelectorAll(".btn-descargar-pdf").forEach(btn => {
-    btn.addEventListener("click", async (e) => {
+    btn.addEventListener("click", (e) => {
       const botonPresionado = e.currentTarget;
       const targetId = botonPresionado.getAttribute("data-form");
 
-      const textoOriginal = botonPresionado.innerHTML;
-      botonPresionado.innerHTML = "⏳ Generando PDF...";
-      botonPresionado.disabled = true;
-
       const correlativo = document.getElementById("correlativo-cia")?.value || "S-N";
       const fecha = document.getElementById("fecha-acto")?.value || new Date().toISOString().slice(0, 10);
-      const nombrePDF = `Parte_Servicio_Bomba_OHiggins_N${correlativo}_${fecha}.pdf`;
 
-      // Contenedor temporal montado sobre el viewport pero oculto detrás de la capa principal
-      const contenedorPDF = document.createElement("div");
-      contenedorPDF.id = "pdf-render-temp";
-      contenedorPDF.style.width = "750px";
-      contenedorPDF.style.padding = "30px";
-      contenedorPDF.style.fontFamily = "Arial, sans-serif";
-      contenedorPDF.style.color = "#1C1C1C";
-      contenedorPDF.style.backgroundColor = "#ffffff";
-      contenedorPDF.style.position = "fixed";
-      contenedorPDF.style.left = "0";
-      contenedorPDF.style.top = "0";
-      contenedorPDF.style.zIndex = "-99999"; // Oculto detrás de la interfaz pero renderizable por Canvas
-
+      // Crear documento HTML en una ventana emergente para renderizado puro y descarga limpia
       let contenidoHTML = `
-        <div style="border-bottom: 3px solid #006B3F; padding-bottom: 12px; margin-bottom: 20px; text-align: center;">
-          <h2 style="color: #006B3F; margin: 0; font-size: 20px; font-weight: bold; letter-spacing: 0.5px;">PRIMERA COMPAÑÍA BOMBA O'HIGGINS</h2>
-          <p style="color: #D4AF37; margin: 4px 0 0 0; font-size: 13px; font-weight: bold;">CUERPO DE BOMBEROS DE RANCAGUA — PARTE OFICIAL DE SERVICIO</p>
-        </div>
+        <!DOCTYPE html>
+        <html lang="es">
+        <head>
+          <meta charset="UTF-8">
+          <title>Parte Oficial N° ${correlativo} - Bomba O'Higgins</title>
+          <style>
+            body { font-family: Arial, sans-serif; margin: 20px; color: #111; font-size: 13px; }
+            .header { text-align: center; border-bottom: 3px solid #006B3F; padding-bottom: 10px; margin-bottom: 20px; }
+            .header h2 { color: #006B3F; margin: 0; font-size: 18px; }
+            .header p { color: #8B8000; margin: 5px 0 0 0; font-weight: bold; font-size: 12px; }
+            table { width: 100%; border-collapse: collapse; margin-bottom: 15px; }
+            th, td { border: 1px solid #ccc; padding: 6px; text-align: left; }
+            th { background-color: #006B3F; color: white; }
+            .cuartel-th { background-color: #333; color: white; }
+            .info-table td { border: none; padding: 4px; }
+            .section-title { color: #006B3F; border-bottom: 2px solid #006B3F; margin-top: 20px; margin-bottom: 10px; font-size: 14px; }
+            .box { border: 1px solid #ccc; padding: 10px; background: #f9f9f9; line-height: 1.4; }
+            @media print {
+              @page { margin: 15mm; size: letter; }
+            }
+          </style>
+        </head>
+        <body>
+          <div class="header">
+            <h2>PRIMERA COMPAÑÍA BOMBA O'HIGGINS</h2>
+            <p>CUERPO DE BOMBEROS DE RANCAGUA — PARTE OFICIAL DE SERVICIO</p>
+          </div>
       `;
 
       if (targetId === "pills-general") {
         const obs = document.getElementById("observaciones-parte")?.value || "Sin observaciones.";
-        
+
         let filasAsistentes = "";
         asistentesAgregados.forEach(v => {
-          filasAsistentes += `<tr><td style="border: 1px solid #dee2e6; padding: 6px; font-weight: bold;">${v.num}</td><td style="border: 1px solid #dee2e6; padding: 6px;">${v.nombre}</td><td style="border: 1px solid #dee2e6; padding: 6px; text-align: center;">${v.tipo}</td></tr>`;
+          filasAsistentes += `<tr><td style="width: 10%; font-weight: bold;">${v.num}</td><td>${v.nombre}</td><td style="width: 20%; text-align: center;">${v.tipo}</td></tr>`;
         });
 
         let filasCuartel = "";
         personalCuartelAgregado.forEach(v => {
-          filasCuartel += `<tr><td style="border: 1px solid #dee2e6; padding: 6px; font-weight: bold;">${v.num}</td><td style="border: 1px solid #dee2e6; padding: 6px;">${v.nombre}</td><td style="border: 1px solid #dee2e6; padding: 6px; text-align: center;">${v.tipo}</td></tr>`;
+          filasCuartel += `<tr><td style="width: 10%; font-weight: bold;">${v.num}</td><td>${v.nombre}</td><td style="width: 20%; text-align: center;">${v.tipo}</td></tr>`;
         });
 
         contenidoHTML += `
-          <table style="width: 100%; margin-bottom: 20px; border-collapse: collapse; font-size: 13px;">
+          <table class="info-table">
             <tr>
-              <td style="padding: 5px; font-weight: bold; color: #006B3F; width: 20%;">Correlativo Cía:</td><td style="padding: 5px; width: 30%;">${correlativo}</td>
-              <td style="padding: 5px; font-weight: bold; color: #006B3F; width: 20%;">Correlativo Gen:</td><td style="padding: 5px; width: 30%;">${document.getElementById("correlativo-gen")?.value || "S-N"}</td>
+              <td style="font-weight: bold; width: 18%;">Correlativo Cía:</td><td style="width: 32%;">${correlativo}</td>
+              <td style="font-weight: bold; width: 18%;">Correlativo Gen:</td><td style="width: 32%;">${document.getElementById("correlativo-gen")?.value || "S-N"}</td>
             </tr>
             <tr>
-              <td style="padding: 5px; font-weight: bold; color: #006B3F;">Fecha:</td><td style="padding: 5px;">${fecha}</td>
-              <td style="padding: 5px; font-weight: bold; color: #006B3F;">Hora:</td><td style="padding: 5px;">${document.getElementById("hora-acto")?.value || "N/E"}</td>
+              <td style="font-weight: bold;">Fecha:</td><td>${fecha}</td>
+              <td style="font-weight: bold;">Hora:</td><td>${document.getElementById("hora-acto")?.value || "N/E"}</td>
             </tr>
             <tr>
-              <td style="padding: 5px; font-weight: bold; color: #006B3F;">Clave del Acto:</td><td style="padding: 5px;">${document.getElementById("clave-acto")?.value || "N/E"}</td>
-              <td style="padding: 5px; font-weight: bold; color: #006B3F;">Dirección:</td><td style="padding: 5px;">${document.getElementById("direccion-acto")?.value || "N/E"} (${document.getElementById("poblacion-villa")?.value || "N/E"})</td>
+              <td style="font-weight: bold;">Clave del Acto:</td><td>${document.getElementById("clave-acto")?.value || "N/E"}</td>
+              <td style="font-weight: bold;">Dirección:</td><td>${document.getElementById("direccion-acto")?.value || "N/E"} (${document.getElementById("poblacion-villa")?.value || "N/E"})</td>
             </tr>
           </table>
 
-          <div style="page-break-inside: avoid;">
-            <h4 style="color: #006B3F; border-bottom: 2px solid #006B3F; padding-bottom: 4px; margin-top: 20px; font-size: 14px;">1. Personal Asistente al Acto</h4>
-            <table style="width: 100%; border-collapse: collapse; font-size: 12px; margin-bottom: 20px;">
-              <thead>
-                <tr style="background-color: #006B3F; color: white;">
-                  <th style="padding: 6px; border: 1px solid #006B3F; text-align: left; width: 10%;">N°</th>
-                  <th style="padding: 6px; border: 1px solid #006B3F; text-align: left;">Nombre Completo</th>
-                  <th style="padding: 6px; border: 1px solid #006B3F; text-align: center; width: 15%;">Calidad</th>
-                </tr>
-              </thead>
-              <tbody>
-                ${filasAsistentes || '<tr><td colspan="3" style="text-align: center; padding: 8px; border: 1px solid #dee2e6;">Sin voluntarios registrados en el acto.</td></tr>'}
-              </tbody>
-            </table>
-          </div>
+          <div class="section-title">1. Personal Asistente al Acto</div>
+          <table>
+            <thead>
+              <tr><th>N°</th><th>Nombre Completo</th><th style="text-align: center;">Calidad</th></tr>
+            </thead>
+            <tbody>
+              ${filasAsistentes || '<tr><td colspan="3" style="text-align: center;">Sin voluntarios registrados en el acto.</td></tr>'}
+            </tbody>
+          </table>
 
-          <div style="page-break-inside: avoid;">
-            <h4 style="color: #006B3F; border-bottom: 2px solid #006B3F; padding-bottom: 4px; margin-top: 20px; font-size: 14px;">2. Personal Permaneció en Cuartel</h4>
-            <table style="width: 100%; border-collapse: collapse; font-size: 12px; margin-bottom: 20px;">
-              <thead>
-                <tr style="background-color: #1C1C1C; color: white;">
-                  <th style="padding: 6px; border: 1px solid #1C1C1C; text-align: left; width: 10%;">N°</th>
-                  <th style="padding: 6px; border: 1px solid #1C1C1C; text-align: left;">Nombre Completo</th>
-                  <th style="padding: 6px; border: 1px solid #1C1C1C; text-align: center; width: 15%;">Calidad</th>
-                </tr>
-              </thead>
-              <tbody>
-                ${filasCuartel || '<tr><td colspan="3" style="text-align: center; padding: 8px; border: 1px solid #dee2e6;">Sin personal registrado en cuartel.</td></tr>'}
-              </tbody>
-            </table>
-          </div>
+          <div class="section-title">2. Personal Permaneció en Cuartel</div>
+          <table>
+            <thead>
+              <tr><th class="cuartel-th">N°</th><th class="cuartel-th">Nombre Completo</th><th class="cuartel-th" style="text-align: center;">Calidad</th></tr>
+            </thead>
+            <tbody>
+              ${filasCuartel || '<tr><td colspan="3" style="text-align: center;">Sin personal registrado en cuartel.</td></tr>'}
+            </tbody>
+          </table>
 
-          <div style="page-break-inside: avoid;">
-            <h4 style="color: #006B3F; border-bottom: 2px solid #006B3F; padding-bottom: 4px; margin-top: 20px; font-size: 14px;">3. Observaciones y Resumen del Servicio</h4>
-            <div style="border: 1px solid #dee2e6; padding: 12px; background-color: #f8f9fa; border-radius: 4px; font-size: 12px; line-height: 1.5;">
-              ${obs.replace(/\n/g, '<br>')}
-            </div>
-          </div>
+          <div class="section-title">3. Observaciones / Resumen del Servicio</div>
+          <div class="box">${obs.replace(/\n/g, '<br>')}</div>
         `;
       } else {
         contenidoHTML += `<p style="text-align: center; padding: 20px;">Reporte Oficial de Servicio.</p>`;
       }
 
-      contenedorPDF.innerHTML = contenidoHTML;
-      document.body.appendChild(contenedorPDF);
+      contenidoHTML += `
+        </body>
+        </html>
+      `;
 
-      const opciones = {
-        margin:       [10, 10, 10, 10],
-        filename:     nombrePDF,
-        image:        { type: 'jpeg', quality: 0.98 },
-        html2canvas:  { scale: 2, logging: false, windowWidth: 800 },
-        jsPDF:        { unit: 'mm', format: 'letter', orientation: 'portrait' }
-      };
+      // Abrir ventana temporal e invocar motor nativo PDF del sistema
+      const ventanaImpresion = window.open("", "_blank", "width=800,height=900");
+      ventanaImpresion.document.write(contenidoHTML);
+      ventanaImpresion.document.close();
 
-      try {
-        await html2pdf().set(opciones).from(contenedorPDF).save();
-      } catch (error) {
-        console.error("Error al generar PDF:", error);
-        alert("Ocurrió un inconveniente al generar el PDF.");
-      } finally {
-        const tempElem = document.getElementById("pdf-render-temp");
-        if (tempElem) {
-          document.body.removeChild(tempElem);
-        }
-        botonPresionado.innerHTML = textoOriginal;
-        botonPresionado.disabled = false;
-      }
+      setTimeout(() => {
+        ventanaImpresion.focus();
+        ventanaImpresion.print();
+        ventanaImpresion.close();
+      }, 300);
     });
   });
 
