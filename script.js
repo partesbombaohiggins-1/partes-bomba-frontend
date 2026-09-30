@@ -471,7 +471,7 @@ document.addEventListener("DOMContentLoaded", () => {
   renderizarListaAsistencia();
 
   // ==========================================
-  // 6. GENERADOR DE PDF MEDIANTE IMPRESIÓN OFICIAL DEL NAVEGADOR
+  // 6. GENERADOR DE PDF NATIVO PARA TODOS LOS MÓDULOS
   // ==========================================
   document.querySelectorAll(".btn-descargar-pdf").forEach(btn => {
     btn.addEventListener("click", (e) => {
@@ -481,13 +481,12 @@ document.addEventListener("DOMContentLoaded", () => {
       const correlativo = document.getElementById("correlativo-cia")?.value || "S-N";
       const fecha = document.getElementById("fecha-acto")?.value || new Date().toISOString().slice(0, 10);
 
-      // Crear documento HTML en una ventana emergente para renderizado puro y descarga limpia
       let contenidoHTML = `
         <!DOCTYPE html>
         <html lang="es">
         <head>
           <meta charset="UTF-8">
-          <title>Parte Oficial N° ${correlativo} - Bomba O'Higgins</title>
+          <title>Reporte Oficial - Bomba O'Higgins</title>
           <style>
             body { font-family: Arial, sans-serif; margin: 20px; color: #111; font-size: 13px; }
             .header { text-align: center; border-bottom: 3px solid #006B3F; padding-bottom: 10px; margin-bottom: 20px; }
@@ -508,7 +507,7 @@ document.addEventListener("DOMContentLoaded", () => {
         <body>
           <div class="header">
             <h2>PRIMERA COMPAÑÍA BOMBA O'HIGGINS</h2>
-            <p>CUERPO DE BOMBEROS DE RANCAGUA — PARTE OFICIAL DE SERVICIO</p>
+            <p>CUERPO DE BOMBEROS DE RANCAGUA — REPORTE OFICIAL DE SERVICIO</p>
           </div>
       `;
 
@@ -564,6 +563,78 @@ document.addEventListener("DOMContentLoaded", () => {
           <div class="section-title">3. Observaciones / Resumen del Servicio</div>
           <div class="box">${obs.replace(/\n/g, '<br>')}</div>
         `;
+      } else if (targetId === "pills-rescate") {
+        const obsRescate = document.getElementById("observaciones-rescate")?.value || "Sin observaciones.";
+
+        let filasRescate = "";
+        asistentesRescateAgregados.forEach(v => {
+          filasRescate += `<tr><td style="width: 10%; font-weight: bold;">${v.num}</td><td>${v.nombre}</td><td style="width: 20%; text-align: center;">${v.tipo}</td></tr>`;
+        });
+
+        contenidoHTML += `
+          <div style="font-weight: bold; margin-bottom: 10px; color: #006B3F;">PARTE ESPECIAL DE RESCATE VEHICULAR</div>
+          <table class="info-table">
+            <tr>
+              <td style="font-weight: bold; width: 18%;">Fecha:</td><td style="width: 32%;">${fecha}</td>
+              <td style="font-weight: bold; width: 18%;">Hora Salida:</td><td style="width: 32%;">${document.getElementById("hora-salida-rescate")?.value || "N/E"}</td>
+            </tr>
+            <tr>
+              <td style="font-weight: bold;">Clave:</td><td>${document.getElementById("clave-rescate")?.value || "10-4"}</td>
+              <td style="font-weight: bold;">Dirección:</td><td>${document.getElementById("direccion-rescate")?.value || "N/E"}</td>
+            </tr>
+          </table>
+
+          <div class="section-title">Personal Asistente al Rescate</div>
+          <table>
+            <thead>
+              <tr><th>N°</th><th>Nombre Completo</th><th style="text-align: center;">Calidad</th></tr>
+            </thead>
+            <tbody>
+              ${filasRescate || '<tr><td colspan="3" style="text-align: center;">Sin voluntarios registrados en el rescate.</td></tr>'}
+            </tbody>
+          </table>
+
+          <div class="section-title">Observaciones del Rescate</div>
+          <div class="box">${obsRescate.replace(/\n/g, '<br>')}</div>
+        `;
+      } else if (targetId === "pills-asistencia") {
+        let filasAsistenciaCompleta = "";
+        let totalPresentes = 0;
+
+        voluntariosCompania.forEach(vol => {
+          const presente = registroAsistencia[vol.num];
+          if (presente) totalPresentes++;
+          filasAsistenciaCompleta += `
+            <tr>
+              <td style="width: 10%; font-weight: bold; text-align: center;">${vol.num}</td>
+              <td>${vol.nombre}</td>
+              <td style="width: 20%; text-align: center;">${vol.tipo}</td>
+              <td style="width: 20%; text-align: center; font-weight: bold; color: ${presente ? '#006B3F' : '#666'};">
+                ${presente ? 'PRESENTE' : 'AUSENTE'}
+              </td>
+            </tr>
+          `;
+        });
+
+        contenidoHTML += `
+          <div style="margin-bottom: 15px; font-weight: bold;">
+            Fecha del Registro: ${fecha} | Total Presentes: ${totalPresentes} / ${voluntariosCompania.length}
+          </div>
+          <div class="section-title">Nómina General de Asistencia de Compañía</div>
+          <table>
+            <thead>
+              <tr>
+                <th style="text-align: center;">N°</th>
+                <th>Nombre Completo</th>
+                <th style="text-align: center;">Calidad</th>
+                <th style="text-align: center;">Estado</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${filasAsistenciaCompleta}
+            </tbody>
+          </table>
+        `;
       } else {
         contenidoHTML += `<p style="text-align: center; padding: 20px;">Reporte Oficial de Servicio.</p>`;
       }
@@ -573,7 +644,6 @@ document.addEventListener("DOMContentLoaded", () => {
         </html>
       `;
 
-      // Abrir ventana temporal e invocar motor nativo PDF del sistema
       const ventanaImpresion = window.open("", "_blank", "width=800,height=900");
       ventanaImpresion.document.write(contenidoHTML);
       ventanaImpresion.document.close();
@@ -681,6 +751,47 @@ ${observaciones}
           usuario_id: 1,
           asistencia: asistenciaBackend
         };
+      } else if (formId === "pills-rescate") {
+        fechaVal = document.getElementById("fecha-acto")?.value || fechaVal;
+        const claveResc = document.getElementById("clave-rescate")?.value || "10-4";
+        const dirResc = document.getElementById("direccion-rescate")?.value || "N/E";
+        const obsResc = document.getElementById("observaciones-rescate")?.value || "Sin observaciones.";
+
+        let listaRescateText = "";
+        let asistenciaBackend = [];
+
+        asistentesRescateAgregados.forEach(vol => {
+          listaRescateText += `- N° ${vol.num}: ${vol.nombre} (${vol.tipo})\n`;
+          asistenciaBackend.push({ num_voluntario: vol.num, nombre_voluntario: vol.nombre, tipo_asistencia: "Rescate" });
+        });
+
+        reporteEstructurado = `PARTE OFICIAL DE RESCATE VEHICULAR - BOMBA O'HIGGINS
+--------------------------------------------------
+DATOS DEL ACTO:
+• Fecha: ${fechaVal} | Clave: ${claveResc}
+• Dirección: ${dirResc}
+
+PERSONAL ASISTENTE AL RESCATE:
+${listaRescateText || "Sin asistentes registrados en rescate."}
+
+OBSERVACIONES:
+${obsResc}
+--------------------------------------------------`;
+
+        datosParaBackend = {
+          correlativo_cia: 0,
+          correlativo_gen: 0,
+          fecha: fechaVal,
+          hora: "00:00",
+          clave: claveResc,
+          direccion: dirResc,
+          poblacion: "",
+          lugar_tipo: "Rescate Vehicular",
+          construccion_tipo: "",
+          observaciones: obsResc,
+          usuario_id: 1,
+          asistencia: asistenciaBackend
+        };
       }
 
       const textoOriginal = botonPresionado.innerHTML;
@@ -691,7 +802,7 @@ ${observaciones}
         await guardarParteEnBackend(datosParaBackend);
 
         const parametrosPlantilla = {
-          asunto: `Parte Oficial N° ${correlativoVal} - Bomba O'Higgins (${fechaVal})`,
+          asunto: `Parte Oficial de Servicio - Bomba O'Higgins (${fechaVal})`,
           mensaje: reporteEstructurado
         };
 
