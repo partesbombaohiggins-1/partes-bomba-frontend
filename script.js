@@ -659,7 +659,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const fecha = document.getElementById("fecha-acto")?.value || new Date().toISOString().slice(0, 10);
       const nombrePDF = `Parte_Servicio_Bomba_OHiggins_N${correlativo}_${fecha}.pdf`;
 
-      // Ocultar botones, menús flotantes e imágenes no compatibles durante la captura
+      // Ocultar botones, menús flotantes e imágenes para evitar Unsupported Image Type
       const elementosOcultar = elementoForm.querySelectorAll(".btn, .form-switch, input[type='file'], .list-group, #resultados-busqueda, #resultados-busqueda-cuartel, img");
       elementosOcultar.forEach(el => el.style.display = "none");
 
