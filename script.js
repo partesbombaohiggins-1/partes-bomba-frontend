@@ -563,8 +563,12 @@ document.addEventListener("DOMContentLoaded", () => {
           <div class="section-title">3. Observaciones / Resumen del Servicio</div>
           <div class="box">${obs.replace(/\n/g, '<br>')}</div>
         `;
-      } else if (targetId === "pills-rescate") {
-        const obsRescate = document.getElementById("observaciones-rescate")?.value || "Sin observaciones.";
+      } else if (targetId === "pills-vehicular") {
+        const obsRescate = document.getElementById("obs-rescate-vehicular")?.value || "Sin observaciones.";
+        const fechaVeh = document.getElementById("fecha-veh")?.value || fecha;
+        const horaVeh = document.getElementById("hora-veh")?.value || "N/E";
+        const claveVeh = document.getElementById("clave-vehicular")?.value || "N/E";
+        const dirVeh = document.getElementById("direccion-veh")?.value || "N/E";
 
         let filasRescate = "";
         asistentesRescateAgregados.forEach(v => {
@@ -572,19 +576,19 @@ document.addEventListener("DOMContentLoaded", () => {
         });
 
         contenidoHTML += `
-          <div style="font-weight: bold; margin-bottom: 10px; color: #006B3F;">PARTE ESPECIAL DE RESCATE VEHICULAR</div>
+          <div style="font-weight: bold; margin-bottom: 10px; color: #006B3F; font-size: 15px;">PARTE ESPECIAL DE RESCATE VEHICULAR</div>
           <table class="info-table">
             <tr>
-              <td style="font-weight: bold; width: 18%;">Fecha:</td><td style="width: 32%;">${fecha}</td>
-              <td style="font-weight: bold; width: 18%;">Hora Salida:</td><td style="width: 32%;">${document.getElementById("hora-salida-rescate")?.value || "N/E"}</td>
+              <td style="font-weight: bold; width: 18%;">Fecha:</td><td style="width: 32%;">${fechaVeh}</td>
+              <td style="font-weight: bold; width: 18%;">Hora:</td><td style="width: 32%;">${horaVeh}</td>
             </tr>
             <tr>
-              <td style="font-weight: bold;">Clave:</td><td>${document.getElementById("clave-rescate")?.value || "10-4"}</td>
-              <td style="font-weight: bold;">Dirección:</td><td>${document.getElementById("direccion-rescate")?.value || "N/E"}</td>
+              <td style="font-weight: bold;">Clave:</td><td>${claveVeh}</td>
+              <td style="font-weight: bold;">Dirección:</td><td>${dirVeh}</td>
             </tr>
           </table>
 
-          <div class="section-title">Personal Asistente al Rescate</div>
+          <div class="section-title">Personal Asistente al Rescate Vehicular</div>
           <table>
             <thead>
               <tr><th>N°</th><th>Nombre Completo</th><th style="text-align: center;">Calidad</th></tr>
@@ -600,6 +604,8 @@ document.addEventListener("DOMContentLoaded", () => {
       } else if (targetId === "pills-asistencia") {
         let filasAsistenciaCompleta = "";
         let totalPresentes = 0;
+        const fechaCitacion = document.getElementById("fecha-citacion-asistencia")?.value || fecha;
+        const tipoCitacion = document.getElementById("tipo-citacion-asistencia")?.value || "Citación";
 
         voluntariosCompania.forEach(vol => {
           const presente = registroAsistencia[vol.num];
@@ -618,7 +624,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         contenidoHTML += `
           <div style="margin-bottom: 15px; font-weight: bold;">
-            Fecha del Registro: ${fecha} | Total Presentes: ${totalPresentes} / ${voluntariosCompania.length}
+            Actividad: ${tipoCitacion} | Fecha: ${fechaCitacion} | Total Presentes: ${totalPresentes} / ${voluntariosCompania.length}
           </div>
           <div class="section-title">Nómina General de Asistencia de Compañía</div>
           <table>
@@ -656,7 +662,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
-  // 7. ENVÍO DE DATOS A EMAILJS Y SUPABASE (COMPATIBLE CON PLANTILLA "mensaje")
+  // 7. ENVÍO DE DATOS A EMAILJS Y SUPABASE
   document.querySelectorAll(".btn-enviar-correo").forEach(btn => {
     btn.addEventListener("click", async (e) => {
       const botonPresionado = e.currentTarget;
@@ -664,7 +670,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
       let reporteEstructurado = "";
       let correlativoVal = "S-N";
-      let fechaVal = new Date().toISOString().slice(0, 10);
+      let fechaVal = document.getElementById("fecha-acto")?.value || new Date().toISOString().slice(0, 10);
 
       let datosParaBackend = {
         correlativo_cia: 0,
@@ -714,26 +720,13 @@ DATOS DEL ACTO:
 • Clave del Acto: ${clave}
 • Dirección: ${direccion} (${poblacion})
 
-CARACTERÍSTICAS DEL LUGAR:
-• Lugar: ${lugarTipo} | Construcción: ${construccion}
-• Ocupante Principal: ${document.getElementById("ocupado-por-1")?.value || "N/E"} (RUT: ${document.getElementById("run-ocupante-1")?.value || "N/E"})
-
-INSTITUCIONES Y OFICIALES:
-• Ambulancia / SAMU: ${document.getElementById("amb-procedencia")?.value || "N/E"}
-• Carabineros: ${document.getElementById("carab-patente")?.value || "N/E"}
-• Oficial a Cargo Cía: ${document.getElementById("oficial-rescate-cia")?.value || "N/E"}
-• Oficial a Cargo Cuerpo: ${document.getElementById("oficial-rescate-cuerpo")?.value || "N/E"}
-
-INVESTIGACIÓN Y ORIGEN:
-• Origen: ${document.getElementById("artefacto-origen")?.value || "N/E"} | Causa: ${document.getElementById("causa-fuego")?.value || "N/E"}
-
 PERSONAL ASISTENTE AL ACTO:
 ${listaAsistentesText || "Sin asistentes registrados."}
 
 PERSONAL EN CUARTEL:
 ${listaCuartelText || "Sin personal registrado en cuartel."}
 
-OBSERVACIONES / RESUMEN:
+OBSERVACIONES:
 ${observaciones}
 --------------------------------------------------`;
 
@@ -751,11 +744,11 @@ ${observaciones}
           usuario_id: 1,
           asistencia: asistenciaBackend
         };
-      } else if (formId === "pills-rescate") {
-        fechaVal = document.getElementById("fecha-acto")?.value || fechaVal;
-        const claveResc = document.getElementById("clave-rescate")?.value || "10-4";
-        const dirResc = document.getElementById("direccion-rescate")?.value || "N/E";
-        const obsResc = document.getElementById("observaciones-rescate")?.value || "Sin observaciones.";
+      } else if (formId === "pills-vehicular") {
+        fechaVal = document.getElementById("fecha-veh")?.value || fechaVal;
+        const claveVeh = document.getElementById("clave-vehicular")?.value || "10-4";
+        const dirVeh = document.getElementById("direccion-veh")?.value || "N/E";
+        const obsVeh = document.getElementById("obs-rescate-vehicular")?.value || "Sin observaciones.";
 
         let listaRescateText = "";
         let asistenciaBackend = [];
@@ -767,33 +760,33 @@ ${observaciones}
 
         reporteEstructurado = `PARTE OFICIAL DE RESCATE VEHICULAR - BOMBA O'HIGGINS
 --------------------------------------------------
-DATOS DEL ACTO:
-• Fecha: ${fechaVal} | Clave: ${claveResc}
-• Dirección: ${dirResc}
+• Fecha: ${fechaVal} | Clave: ${claveVeh}
+• Dirección: ${dirVeh}
 
 PERSONAL ASISTENTE AL RESCATE:
 ${listaRescateText || "Sin asistentes registrados en rescate."}
 
 OBSERVACIONES:
-${obsResc}
+${obsVeh}
 --------------------------------------------------`;
 
         datosParaBackend = {
-          correlativo_cia: 0,
+          correlativo_cia: parseInt(document.getElementById("correlativo-veh")?.value) || 0,
           correlativo_gen: 0,
           fecha: fechaVal,
-          hora: "00:00",
-          clave: claveResc,
-          direccion: dirResc,
+          hora: document.getElementById("hora-veh")?.value || "00:00",
+          clave: claveVeh,
+          direccion: dirVeh,
           poblacion: "",
           lugar_tipo: "Rescate Vehicular",
           construccion_tipo: "",
-          observaciones: obsResc,
+          observaciones: obsVeh,
           usuario_id: 1,
           asistencia: asistenciaBackend
         };
       } else if (formId === "pills-asistencia") {
-        fechaVal = document.getElementById("fecha-acto")?.value || fechaVal;
+        fechaVal = document.getElementById("fecha-citacion-asistencia")?.value || fechaVal;
+        const tipoCitacion = document.getElementById("tipo-citacion-asistencia")?.value || "Citación";
         let listaAsistenciaText = "";
         let totalPresentes = 0;
         let asistenciaBackend = [];
@@ -809,6 +802,7 @@ ${obsResc}
 
         reporteEstructurado = `NÓMINA GENERAL DE ASISTENCIA - BOMBA O'HIGGINS
 --------------------------------------------------
+• Actividad: ${tipoCitacion}
 • Fecha del Registro: ${fechaVal}
 • Total Presentes: ${totalPresentes} / ${voluntariosCompania.length}
 
@@ -820,13 +814,13 @@ ${listaAsistenciaText || "Sin voluntarios marcados como presentes."}
           correlativo_cia: 0,
           correlativo_gen: 0,
           fecha: fechaVal,
-          hora: "00:00",
-          clave: "ASISTENCIA",
+          hora: document.getElementById("hora-inicio-asistencia")?.value || "00:00",
+          clave: tipoCitacion,
           direccion: "Cuartel Cía",
           poblacion: "",
           lugar_tipo: "Lista Asistencia",
           construccion_tipo: "",
-          observaciones: "Registro de Asistencia General",
+          observaciones: document.getElementById("obs-asistencia-general")?.value || "Registro de Asistencia General",
           usuario_id: 1,
           asistencia: asistenciaBackend
         };
@@ -839,7 +833,6 @@ ${listaAsistenciaText || "Sin voluntarios marcados como presentes."}
       try {
         await guardarParteEnBackend(datosParaBackend);
 
-        // Se envía tanto "mensaje" como "notes" para garantizar compatibilidad con cualquier plantilla de EmailJS
         const parametrosPlantilla = {
           mensaje: reporteEstructurado,
           notes: reporteEstructurado
