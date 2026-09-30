@@ -99,7 +99,7 @@ async function guardarParteEnBackend(datosParte) {
       console.error("❌ Error retornado por el servidor:", resultado.error);
     }
   } catch (error) {
-    console.error("⚠️ Error de conexión con el backend:", error);
+    console.error("⚠️️ Error de conexión con el backend:", error);
   }
 }
 
@@ -889,27 +889,26 @@ ${observaciones}
       botonPresionado.innerHTML = "⏳ Enviando parte...";
       botonPresionado.disabled = true;
 
-      // 1. Guardar registro en Supabase a través de Render
-      await guardarParteEnBackend(datosParaBackend);
+      try {
+        // 1. Guardar en Supabase a través de Render
+        await guardarParteEnBackend(datosParaBackend);
 
-      // 2. Enviar correo usando la plantilla visual de EmailJS
-      const parametrosPlantilla = {
-        asunto: `Parte Oficial N° ${correlativoVal} - Bomba O'Higgins (${fechaVal})`,
-        mensaje: reporteEstructurado
-      };
+        // 2. Enviar a EmailJS con la plantilla visual
+        const parametrosPlantilla = {
+          asunto: `Parte Oficial N° ${correlativoVal} - Bomba O'Higgins (${fechaVal})`,
+          mensaje: reporteEstructurado
+        };
 
-      emailjs.send("service_0j6b43d", "template_e631aiq", parametrosPlantilla)
-        .then(() => {
-          alert("✅ Parte registrado exitosamente en la Base de Datos y enviado por correo a partesbombaohiggins@gmail.com");
-        })
-        .catch((error) => {
-          console.error("Error al enviar con EmailJS:", error);
-          alert("⚠️ El parte fue registrado en la base de datos, pero ocurrió un problema al enviar la notificación.");
-        })
-        .finally(() => {
-          botonPresionado.innerHTML = textoOriginal;
-          botonPresionado.disabled = false;
-        });
+        await emailjs.send("service_0j6b43d", "template_e631aiq", parametrosPlantilla);
+
+        alert("✅ Parte registrado exitosamente en la Base de Datos y enviado por correo a partesbombaohiggins@gmail.com");
+      } catch (error) {
+        console.error("Error en el proceso:", error);
+        alert("⚠️ Hubo un inconveniente al enviar el correo, pero la información se procesó.");
+      } finally {
+        botonPresionado.innerHTML = textoOriginal;
+        botonPresionado.disabled = false;
+      }
     });
   });
 
