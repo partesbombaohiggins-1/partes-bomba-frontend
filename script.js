@@ -639,8 +639,20 @@ document.addEventListener("DOMContentLoaded", () => {
   renderizarListaAsistencia();
 
   // ==========================================
-  // 7. DESCARGA LOCAL DE PDF Y ENVÍO RECOPILADO POR CORREO Y BACKEND
+  // 7. DESCARGA LOCAL DE PDF Y ENVÍO ADJUNTO A EMAILJS Y SUPABASE
   // ==========================================
+
+  // Configuración estándar para generar un PDF imprimible de alta calidad (Letter/Carta)
+  function obtenerOpcionesPDF(nombreArchivo) {
+    return {
+      margin:       [10, 10, 10, 10],
+      filename:     nombreArchivo,
+      image:        { type: 'jpeg', quality: 0.98 },
+      html2canvas:  { scale: 2, useCORS: true, logging: false, scrollY: 0 },
+      jsPDF:        { unit: 'mm', format: 'letter', orientation: 'portrait' },
+      pagebreak:    { mode: ['avoid-all', 'css', 'legacy'] }
+    };
+  }
 
   // DESCARGA LOCAL DE ARCHIVO PDF
   document.querySelectorAll(".btn-descargar-pdf").forEach(btn => {
@@ -662,19 +674,11 @@ document.addEventListener("DOMContentLoaded", () => {
       const elementosOcultar = elementoForm.querySelectorAll(".btn, .form-switch, input[type='file'], .list-group, #resultados-busqueda, #resultados-busqueda-cuartel");
       elementosOcultar.forEach(el => el.style.display = "none");
 
-      const opciones = {
-        margin:       [10, 10, 10, 10],
-        filename:     nombrePDF,
-        image:        { type: 'jpeg', quality: 0.98 },
-        html2canvas:  { scale: 2, useCORS: true, logging: false, scrollY: 0 },
-        jsPDF:        { unit: 'mm', format: 'letter', orientation: 'portrait' }
-      };
-
       try {
-        await html2pdf().set(opciones).from(elementoForm).save();
+        await html2pdf().set(obtenerOpcionesPDF(nombrePDF)).from(elementoForm).save();
       } catch (error) {
         console.error("Error al generar PDF:", error);
-        alert("Ocurrió un inconveniente al generar el PDF. Puede presionar Ctrl + P y elegir 'Guardar como PDF'.");
+        alert("Ocurrió un inconveniente al generar el PDF. Intente de nuevo.");
       } finally {
         elementosOcultar.forEach(el => el.style.display = "");
         botonPresionado.innerHTML = textoOriginal;
@@ -683,17 +687,18 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
-  // ENVÍO DE DATOS A EMAILJS Y PERSISTENCIA EN SUPABASE
+  // ENVÍO DE DATOS A EMAILJS CON PDF ADJUNTO Y PERSISTENCIA EN SUPABASE
   document.querySelectorAll(".btn-enviar-correo").forEach(btn => {
     btn.addEventListener("click", async (e) => {
       const botonPresionado = e.currentTarget;
       const formId = botonPresionado.getAttribute("data-form");
+      const elementoForm = document.getElementById(formId);
 
-      let reporteEstructurado = "";
+      if (!elementoForm) return;
+
       let correlativoVal = "S-N";
       let fechaVal = new Date().toISOString().slice(0, 10);
 
-      // Objeto genérico para la API
       let datosParaBackend = {
         correlativo_cia: 0,
         correlativo_gen: 0,
@@ -705,7 +710,7 @@ document.addEventListener("DOMContentLoaded", () => {
         lugar_tipo: "",
         construccion_tipo: "",
         observaciones: "",
-        usuario_id: 1, // Usuario administrador por defecto
+        usuario_id: 1,
         asistencia: []
       };
 
@@ -720,58 +725,13 @@ document.addEventListener("DOMContentLoaded", () => {
         const construccion = document.getElementById("construccion-tipo")?.value || "N/E";
         const observaciones = document.getElementById("observaciones-parte")?.value || "Sin observaciones.";
 
-        let listaAsistentesText = "";
         let asistenciaBackend = [];
-
         asistentesAgregados.forEach(vol => {
-          listaAsistentesText += `- N° ${vol.num}: ${vol.nombre} (${vol.tipo})\n`;
-          asistenciaBackend.push({
-            num_voluntario: vol.num,
-            nombre_voluntario: vol.nombre,
-            tipo_asistencia: "Asistió"
-          });
+          asistenciaBackend.push({ num_voluntario: vol.num, nombre_voluntario: vol.nombre, tipo_asistencia: "Asistió" });
         });
-
-        let listaCuartelText = "";
         personalCuartelAgregado.forEach(vol => {
-          listaCuartelText += `- N° ${vol.num}: ${vol.nombre} (${vol.tipo})\n`;
-          asistenciaBackend.push({
-            num_voluntario: vol.num,
-            nombre_voluntario: vol.nombre,
-            tipo_asistencia: "Cuartel"
-          });
+          asistenciaBackend.push({ num_voluntario: vol.num, nombre_voluntario: vol.nombre, tipo_asistencia: "Cuartel" });
         });
-
-        reporteEstructurado = `PARTE OFICIAL DE SERVICIO GENERAL - BOMBA O'HIGGINS
---------------------------------------------------
-DATOS DEL ACTO:
-• Correlativo Cía: ${correlativoVal} | General: ${document.getElementById("correlativo-gen")?.value || "S-N"}
-• Fecha: ${fechaVal} | Hora: ${hora}
-• Clave del Acto: ${clave}
-• Dirección: ${direccion} (${poblacion})
-
-CARACTERÍSTICAS DEL LUGAR:
-• Lugar: ${lugarTipo} | Construcción: ${construccion}
-• Ocupante Principal: ${document.getElementById("ocupado-por-1")?.value || "N/E"} (RUT: ${document.getElementById("run-ocupante-1")?.value || "N/E"})
-
-INSTITUCIONES Y OFICIALES:
-• Ambulancia / SAMU: ${document.getElementById("amb-procedencia")?.value || "N/E"}
-• Carabineros: ${document.getElementById("carab-patente")?.value || "N/E"}
-• Oficial a Cargo Cía: ${document.getElementById("oficial-rescate-cia")?.value || "N/E"}
-• Oficial a Cargo Cuerpo: ${document.getElementById("oficial-rescate-cuerpo")?.value || "N/E"}
-
-INVESTIGACIÓN Y ORIGEN:
-• Origen: ${document.getElementById("artefacto-origen")?.value || "N/E"} | Causa: ${document.getElementById("causa-fuego")?.value || "N/E"}
-
-PERSONAL ASISTENTE AL ACTO:
-${listaAsistentesText || "Sin asistentes registrados."}
-
-PERSONAL EN CUARTEL:
-${listaCuartelText || "Sin personal registrado en cuartel."}
-
-OBSERVACIONES / RESUMEN:
-${observaciones}
---------------------------------------------------`;
 
         datosParaBackend = {
           correlativo_cia: parseInt(correlativoVal) || 0,
@@ -796,40 +756,10 @@ ${observaciones}
         const direccion = document.getElementById("direccion-veh")?.value || "N/E";
         const observaciones = document.getElementById("obs-rescate-vehicular")?.value || "Sin observaciones.";
 
-        let listaAsistentesText = "";
         let asistenciaBackend = [];
-
         asistentesRescateAgregados.forEach(vol => {
-          listaAsistentesText += `- N° ${vol.num}: ${vol.nombre} (${vol.tipo})\n`;
-          asistenciaBackend.push({
-            num_voluntario: vol.num,
-            nombre_voluntario: vol.nombre,
-            tipo_asistencia: "Rescate"
-          });
+          asistenciaBackend.push({ num_voluntario: vol.num, nombre_voluntario: vol.nombre, tipo_asistencia: "Rescate" });
         });
-
-        reporteEstructurado = `PARTE OFICIAL DE RESCATE VEHICULAR - BOMBA O'HIGGINS
---------------------------------------------------
-DATOS DEL RESCATE:
-• Correlativo Cía: ${correlativoVal}
-• Fecha: ${fechaVal} | Hora: ${hora}
-• Clave Rescate: ${clave}
-• Dirección / Ruta: ${direccion}
-
-DATOS VEHÍCULO Y CONDUCTOR:
-• Conductor: ${document.getElementById("v1-nombre")?.value || "N/E"} (RUT: ${document.getElementById("v1-ci")?.value || "N/E"})
-• Vehículo: ${document.getElementById("v1-marca")?.value || "N/E"} ${document.getElementById("v1-modelo")?.value || ""} | Patente: ${document.getElementById("v1-patente")?.value || "N/E"}
-• Lesionados Trasladados a: ${document.getElementById("v1-derivado")?.value || "N/E"}
-
-MATERIAL MENOR UTILIZADO:
-• Collares: ${document.getElementById("mat-collares")?.value || "0"} | Tablas: ${document.getElementById("mat-tablas")?.value || "0"} | Chalecos: ${document.getElementById("mat-chalecos")?.value || "0"}
-
-PERSONAL ASISTENTE AL RESCATE:
-${listaAsistentesText || "Sin asistentes registrados."}
-
-OBSERVACIONES DEL RESCATE:
-${observaciones}
---------------------------------------------------`;
 
         datosParaBackend = {
           correlativo_cia: parseInt(correlativoVal) || 0,
@@ -852,39 +782,15 @@ ${observaciones}
         const oficialCargo = document.getElementById("oficial-a-cargo-asistencia")?.value || "N/E";
         const observaciones = document.getElementById("obs-asistencia-general")?.value || "Sin observaciones.";
 
-        let presentesText = "";
-        let countPresentes = 0;
         let asistenciaBackend = [];
-
         Object.keys(registroAsistencia).forEach(num => {
           if (registroAsistencia[num] === true) {
             const vol = voluntariosCompania.find(v => v.num == num);
             if (vol) {
-              presentesText += `- N° ${vol.num}: ${vol.nombre} (${vol.tipo})\n`;
-              countPresentes++;
-              asistenciaBackend.push({
-                num_voluntario: vol.num,
-                nombre_voluntario: vol.nombre,
-                tipo_asistencia: "Presente"
-              });
+              asistenciaBackend.push({ num_voluntario: vol.num, nombre_voluntario: vol.nombre, tipo_asistencia: "Presente" });
             }
           }
         });
-
-        reporteEstructurado = `CONTROL OFICIAL DE ASISTENCIA - BOMBA O'HIGGINS
---------------------------------------------------
-DATOS DE LA CITACIÓN:
-• Tipo de Actividad: ${citacion}
-• Fecha: ${fechaVal} | Hora Inicio: ${document.getElementById("hora-inicio-asistencia")?.value || "N/E"}
-• Oficial a Cargo: ${oficialCargo}
-• Total Presentes: ${countPresentes} de ${voluntariosCompania.length} Voluntarios
-
-LISTA DE VOLUNTARIOS PRESENTES:
-${presentesText || "Sin voluntarios marcados como presentes."}
-
-OBSERVACIONES:
-${observaciones}
---------------------------------------------------`;
 
         datosParaBackend = {
           correlativo_cia: 0,
@@ -903,30 +809,43 @@ ${observaciones}
       }
 
       const textoOriginal = botonPresionado.innerHTML;
-      botonPresionado.innerHTML = "⏳ Enviando parte...";
+      botonPresionado.innerHTML = "⏳ Procesando PDF y enviando...";
       botonPresionado.disabled = true;
 
       // 1. Guardar registro en la Base de Datos de Supabase a través del backend en Render
       await guardarParteEnBackend(datosParaBackend);
 
-      // 2. Enviar la notificación formal por correo vía EmailJS
-      const parametrosPlantilla = {
-        asunto: `Parte de Servicio N° ${correlativoVal} - Bomba O'Higgins (${fechaVal})`,
-        mensaje: reporteEstructurado
-      };
+      // 2. Ocultar botones e interfaces antes de capturar el PDF
+      const elementosOcultar = elementoForm.querySelectorAll(".btn, .form-switch, input[type='file'], .list-group, #resultados-busqueda, #resultados-busqueda-cuartel");
+      elementosOcultar.forEach(el => el.style.display = "none");
 
-      emailjs.send("service_0j6b43d", "template_e631aiq", parametrosPlantilla)
-        .then(() => {
-          alert("✅ Parte registrado exitosamente en la Base de Datos y enviado por correo a partesbombaohiggins@gmail.com");
-        })
-        .catch((error) => {
-          console.error("Error al enviar con EmailJS:", error);
-          alert("⚠️ El parte fue registrado en el sistema, pero ocurrió un inconveniente con la notificación por correo.");
-        })
-        .finally(() => {
-          botonPresionado.innerHTML = textoOriginal;
-          botonPresionado.disabled = false;
-        });
+      const nombrePDF = `Parte_Oficial_N${correlativoVal}_${fechaVal}.pdf`;
+
+      try {
+        // Generar el PDF en memoria como String Base64 para EmailJS
+        const pdfBase64 = await html2pdf().set(obtenerOpcionesPDF(nombrePDF)).from(elementoForm).outputPdf('datauristring');
+
+        // Restablecer la visibilidad de los botones en la pantalla
+        elementosOcultar.forEach(el => el.style.display = "");
+
+        // Parámetros pasados a la plantilla de EmailJS con el PDF adjunto
+        const parametrosPlantilla = {
+          asunto: `Parte Oficial N° ${correlativoVal} - Bomba O'Higgins (${fechaVal})`,
+          content_pdf: pdfBase64
+        };
+
+        // Enviar a EmailJS
+        await emailjs.send("service_0j6b43d", "template_e631aiq", parametrosPlantilla);
+        alert("✅ Parte guardado en Supabase y correo enviado con el archivo PDF adjunto a partesbombaohiggins@gmail.com");
+
+      } catch (error) {
+        elementosOcultar.forEach(el => el.style.display = "");
+        console.error("Error al procesar el envío:", error);
+        alert("⚠️️ El parte fue guardado en la base de datos, pero ocurrió un inconveniente al generar o enviar el archivo PDF.");
+      } finally {
+        botonPresionado.innerHTML = textoOriginal;
+        botonPresionado.disabled = false;
+      }
     });
   });
 
