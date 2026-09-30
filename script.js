@@ -78,20 +78,15 @@ const voluntariosCompania = [
   { num: 76, nombre: "Arriagada Contreras Joaquin", tipo: "VA" }
 ];
 
-// URL Base de la API REST backend en Render
 const API_URL = "https://partes-bomba-backend.onrender.com/api";
 
-// Función auxiliar para registrar el parte en la base de datos Supabase
 async function guardarParteEnBackend(datosParte) {
   try {
     const respuesta = await fetch(`${API_URL}/partes`, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify(datosParte)
     });
-
     const resultado = await respuesta.json();
     if (respuesta.ok) {
       console.log("✅ Registro exitoso en Supabase:", resultado);
@@ -114,9 +109,7 @@ document.addEventListener("DOMContentLoaded", () => {
       .replace(/[^a-z0-9]/g, "");
   }
 
-  // ==========================================
-  // 1. OCUPANTES DINÁMICOS EN PARTE GENERAL
-  // ==========================================
+  // 1. OCUPANTES DINÁMICOS
   const selectCantOcupantes = document.getElementById("cant-ocupantes");
   if (selectCantOcupantes) {
     selectCantOcupantes.addEventListener("change", (e) => {
@@ -124,19 +117,14 @@ document.addEventListener("DOMContentLoaded", () => {
       for (let i = 1; i <= 4; i++) {
         const bloque = document.getElementById(`bloque-ocupante-${i}`);
         if (bloque) {
-          if (i <= cantidad) {
-            bloque.classList.remove("d-none");
-          } else {
-            bloque.classList.add("d-none");
-          }
+          if (i <= cantidad) bloque.classList.remove("d-none");
+          else bloque.classList.add("d-none");
         }
       }
     });
   }
 
-  // ==========================================
   // 2. PARTE GENERAL: ASISTENTES AL ACTO
-  // ==========================================
   const inputBuscar = document.getElementById("buscar-bombero");
   const contenedorResultados = document.getElementById("resultados-busqueda");
   const tablaCuerpo = document.getElementById("tabla-asistentes-cuerpo");
@@ -223,9 +211,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // ==========================================
   // 3. PARTE GENERAL: PERSONAL EN CUARTEL
-  // ==========================================
   const switchCuartel = document.getElementById("switch-en-cuartel");
   const contenedorCuartel = document.getElementById("contenedor-en-cuartel");
   const inputCuartel = document.getElementById("buscar-bombero-cuartel");
@@ -235,11 +221,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
   if (switchCuartel && contenedorCuartel) {
     switchCuartel.addEventListener("change", (e) => {
-      if (e.target.checked) {
-        contenedorCuartel.classList.remove("d-none");
-      } else {
-        contenedorCuartel.classList.add("d-none");
-      }
+      if (e.target.checked) contenedorCuartel.classList.remove("d-none");
+      else contenedorCuartel.classList.add("d-none");
     });
   }
 
@@ -324,9 +307,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // ==========================================
-  // 4. PARTE RESCATE VEHICULAR: ASISTENCIA Y CUARTEL
-  // ==========================================
+  // 4. RESCATE VEHICULAR
   const inputBuscarRescate = document.getElementById("buscar-bombero-rescate");
   const resultadosRescate = document.getElementById("resultados-busqueda-rescate");
   const tablaRescateCuerpo = document.getElementById("tabla-asistentes-rescate-cuerpo");
@@ -413,149 +394,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // RESCATE VEHICULAR: EN CUARTEL
-  const switchCuartelRescate = document.getElementById("switch-en-cuartel-rescate");
-  const contenedorCuartelRescate = document.getElementById("contenedor-en-cuartel-rescate");
-  const inputCuartelRescate = document.getElementById("buscar-bombero-cuartel-rescate");
-  const resultadosCuartelRescate = document.getElementById("resultados-busqueda-cuartel-rescate");
-  const tablaCuartelRescateCuerpo = document.getElementById("tabla-cuartel-rescate-cuerpo");
-  let personalCuartelRescateAgregado = [];
-
-  if (switchCuartelRescate && contenedorCuartelRescate) {
-    switchCuartelRescate.addEventListener("change", (e) => {
-      if (e.target.checked) {
-        contenedorCuartelRescate.classList.remove("d-none");
-      } else {
-        contenedorCuartelRescate.classList.add("d-none");
-      }
-    });
-  }
-
-  if (inputCuartelRescate && resultadosCuartelRescate) {
-    inputCuartelRescate.addEventListener("input", () => {
-      const busqueda = normalizarTexto(inputCuartelRescate.value);
-      resultadosCuartelRescate.innerHTML = "";
-
-      if (busqueda.length < 1) {
-        resultadosCuartelRescate.style.setProperty("display", "none", "important");
-        return;
-      }
-
-      const filtrados = voluntariosCompania.filter(vol => {
-        if (!vol || !vol.nombre) return false;
-        const numStr = vol.num ? vol.num.toString() : "";
-        return normalizarTexto(vol.nombre).includes(busqueda) || numStr === busqueda;
-      });
-
-      if (filtrados.length === 0) {
-        resultadosCuartelRescate.innerHTML = `<div class="list-group-item text-muted p-2 bg-white">No hay coincidencias</div>`;
-      } else {
-        filtrados.forEach(vol => {
-          const item = document.createElement("button");
-          item.type = "button";
-          item.className = "list-group-item list-group-item-action py-2 text-start fw-bold bg-white";
-          item.innerHTML = `<span class="badge bg-secondary me-2">${vol.num}</span> ${vol.nombre} <small class="text-muted">(${vol.tipo})</small>`;
-          
-          item.addEventListener("click", () => {
-            agregarACuartelRescate(vol);
-            inputCuartelRescate.value = "";
-            resultadosCuartelRescate.style.setProperty("display", "none", "important");
-          });
-          resultadosCuartelRescate.appendChild(item);
-        });
-      }
-      resultadosCuartelRescate.style.setProperty("display", "block", "important");
-    });
-
-    document.addEventListener("click", (e) => {
-      if (!inputCuartelRescate.contains(e.target) && !resultadosCuartelRescate.contains(e.target)) {
-        resultadosCuartelRescate.style.setProperty("display", "none", "important");
-      }
-    });
-  }
-
-  function agregarACuartelRescate(voluntario) {
-    if (personalCuartelRescateAgregado.some(item => item.num === voluntario.num)) {
-      alert("El voluntario ya está registrado en la lista de cuartel.");
-      return;
-    }
-    personalCuartelRescateAgregado.push(voluntario);
-    renderizarTablaCuartelRescate();
-  }
-
-  function renderizarTablaCuartelRescate() {
-    if (!tablaCuartelRescateCuerpo) return;
-    if (personalCuartelRescateAgregado.length === 0) {
-      tablaCuartelRescateCuerpo.innerHTML = `<tr id="sin-cuartel-rescate"><td colspan="4" class="text-center text-muted">No hay voluntarios registrados en cuartel.</td></tr>`;
-      return;
-    }
-    tablaCuartelRescateCuerpo.innerHTML = "";
-    personalCuartelRescateAgregado.forEach(vol => {
-      const tr = document.createElement("tr");
-      tr.innerHTML = `
-        <td class="fw-bold">${vol.num}</td>
-        <td>${vol.nombre}</td>
-        <td class="text-center"><span class="badge bg-secondary">${vol.tipo}</span></td>
-        <td class="text-center">
-          <button type="button" class="btn btn-sm btn-outline-danger btn-quitar-cuartel-rescate" data-num="${vol.num}">✕</button>
-        </td>
-      `;
-      tablaCuartelRescateCuerpo.appendChild(tr);
-    });
-
-    document.querySelectorAll(".btn-quitar-cuartel-rescate").forEach(btn => {
-      btn.addEventListener("click", (e) => {
-        const numEliminar = parseInt(e.target.getAttribute("data-num"));
-        personalCuartelRescateAgregado = personalCuartelRescateAgregado.filter(item => item.num !== numEliminar);
-        renderizarTablaCuartelRescate();
-      });
-    });
-  }
-
-  // ==========================================
-  // 5. REGISTRO FOTOGRÁFICO DE EMERGENCIA
-  // ==========================================
-  const inputFotos = document.getElementById("input-fotos-registro");
-  const contenedorPrevia = document.getElementById("vista-previa-fotos");
-  let archivosFotos = [];
-
-  if (inputFotos && contenedorPrevia) {
-    inputFotos.addEventListener("change", (e) => {
-      const nuevosArchivos = Array.from(e.target.files);
-      archivosFotos = archivosFotos.concat(nuevosArchivos);
-      renderizarVistaPrevia();
-    });
-
-    function renderizarVistaPrevia() {
-      contenedorPrevia.innerHTML = "";
-
-      archivosFotos.forEach((archivo, index) => {
-        if (archivo.type.startsWith("image/")) {
-          const lector = new FileReader();
-          lector.onload = (evento) => {
-            const div = document.createElement("div");
-            div.className = "position-relative d-inline-block me-2 mb-2";
-            div.innerHTML = `
-              <img src="${evento.target.result}" class="img-thumbnail rounded shadow-sm" style="width: 105px; height: 105px; object-fit: cover;">
-              <button type="button" class="btn btn-danger btn-sm position-absolute top-0 end-0 rounded-circle m-1 px-2 py-0 fw-bold btn-quitar-foto" data-index="${index}" style="line-height: 1.2; font-size: 12px; z-index: 10;">✕</button>
-            `;
-            contenedorPrevia.appendChild(div);
-
-            div.querySelector(".btn-quitar-foto").addEventListener("click", (e) => {
-              const idxEliminar = parseInt(e.target.getAttribute("data-index"));
-              archivosFotos.splice(idxEliminar, 1);
-              renderizarVistaPrevia();
-            });
-          };
-          lector.readAsDataURL(archivo);
-        }
-      });
-    }
-  }
-
-  // ==========================================
-  // 6. SECCIÓN 3: CONTROL ASISTENCIA COMPLETO
-  // ==========================================
+  // 5. CONTROL ASISTENCIA COMPLETO
   const tablaAsistencia = document.getElementById("tabla-asistencia-completa-cuerpo");
   const filtroAsistencia = document.getElementById("filtro-voluntario-asistencia");
   const contadorAsistencia = document.getElementById("contador-asistencia");
@@ -605,11 +444,8 @@ document.addEventListener("DOMContentLoaded", () => {
       tr.querySelector(`#chk-ast-${vol.num}`).addEventListener("change", (e) => {
         const numVol = parseInt(e.target.getAttribute("data-num"));
         registroAsistencia[numVol] = e.target.checked;
-        if (e.target.checked) {
-          tr.classList.add("table-success");
-        } else {
-          tr.classList.remove("table-success");
-        }
+        if (e.target.checked) tr.classList.add("table-success");
+        else tr.classList.remove("table-success");
         actualizarContadorAsistencia();
       });
     });
@@ -623,15 +459,11 @@ document.addEventListener("DOMContentLoaded", () => {
     contadorAsistencia.textContent = `${totalPresentes} / ${voluntariosCompania.length} Presentes`;
   }
 
-  if (filtroAsistencia) {
-    filtroAsistencia.addEventListener("input", renderizarListaAsistencia);
-  }
+  if (filtroAsistencia) filtroAsistencia.addEventListener("input", renderizarListaAsistencia);
 
   if (btnResetAsistencia) {
     btnResetAsistencia.addEventListener("click", () => {
-      voluntariosCompania.forEach(vol => {
-        registroAsistencia[vol.num] = false;
-      });
+      voluntariosCompania.forEach(vol => { registroAsistencia[vol.num] = false; });
       renderizarListaAsistencia();
     });
   }
@@ -639,17 +471,12 @@ document.addEventListener("DOMContentLoaded", () => {
   renderizarListaAsistencia();
 
   // ==========================================
-  // 7. DESCARGA LOCAL DE PDF Y ENVÍO A EMAILJS / SUPABASE
+  // 6. GENERADOR DE PDF OFICIAL LIMPIO Y COMPATIBLE
   // ==========================================
-
-  // DESCARGA LOCAL DE ARCHIVO PDF EN TAMAÑO CARTA
   document.querySelectorAll(".btn-descargar-pdf").forEach(btn => {
     btn.addEventListener("click", async (e) => {
       const botonPresionado = e.currentTarget;
       const targetId = botonPresionado.getAttribute("data-form");
-      const elementoForm = document.getElementById(targetId);
-
-      if (!elementoForm) return;
 
       const textoOriginal = botonPresionado.innerHTML;
       botonPresionado.innerHTML = "⏳ Generando PDF...";
@@ -659,30 +486,107 @@ document.addEventListener("DOMContentLoaded", () => {
       const fecha = document.getElementById("fecha-acto")?.value || new Date().toISOString().slice(0, 10);
       const nombrePDF = `Parte_Servicio_Bomba_OHiggins_N${correlativo}_${fecha}.pdf`;
 
-      // Crear un clon del elemento HTML sin imágenes para evitar Unsupported Image Type en html2canvas
-      const clonElemento = elementoForm.cloneNode(true);
-      
-      // Ocultar botones, switches y listas desplegables en el clon
-      clonElemento.querySelectorAll(".btn, .form-switch, input[type='file'], .list-group, #resultados-busqueda, #resultados-busqueda-cuartel").forEach(el => {
-        el.style.display = "none";
-      });
+      // Contenedor temporal de texto y tablas puras sin gráficos ni SVGs pesados
+      const contenedorPDF = document.createElement("div");
+      contenedorPDF.style.padding = "25px";
+      contenedorPDF.style.fontFamily = "Arial, sans-serif";
+      contenedorPDF.style.color = "#1C1C1C";
+      contenedorPDF.style.backgroundColor = "#ffffff";
 
-      // Eliminar cualquier etiqueta <img> dentro del clon
-      clonElemento.querySelectorAll("img").forEach(img => img.remove());
+      let contenidoHTML = `
+        <div style="border-bottom: 3px solid #006B3F; padding-bottom: 12px; margin-bottom: 20px; text-align: center;">
+          <h2 style="color: #006B3F; margin: 0; font-size: 20px; letter-spacing: 0.5px;">PRIMERA COMPAÑÍA BOMBA O'HIGGINS</h2>
+          <p style="color: #D4AF37; margin: 4px 0 0 0; font-size: 13px; font-weight: bold;">CUERPO DE BOMBEROS DE RANCAGUA — PARTE OFICIAL DE SERVICIO</p>
+        </div>
+      `;
+
+      if (targetId === "pills-general") {
+        const obs = document.getElementById("observaciones-parte")?.value || "Sin observaciones.";
+        
+        let filasAsistentes = "";
+        asistentesAgregados.forEach(v => {
+          filasAsistentes += `<tr><td style="border: 1px solid #dee2e6; padding: 6px; font-weight: bold;">${v.num}</td><td style="border: 1px solid #dee2e6; padding: 6px;">${v.nombre}</td><td style="border: 1px solid #dee2e6; padding: 6px; text-align: center;">${v.tipo}</td></tr>`;
+        });
+
+        let filasCuartel = "";
+        personalCuartelAgregado.forEach(v => {
+          filasCuartel += `<tr><td style="border: 1px solid #dee2e6; padding: 6px; font-weight: bold;">${v.num}</td><td style="border: 1px solid #dee2e6; padding: 6px;">${v.nombre}</td><td style="border: 1px solid #dee2e6; padding: 6px; text-align: center;">${v.tipo}</td></tr>`;
+        });
+
+        contenidoHTML += `
+          <table style="width: 100%; margin-bottom: 20px; border-collapse: collapse; font-size: 13px;">
+            <tr>
+              <td style="padding: 5px; font-weight: bold; color: #006B3F; width: 20%;">Correlativo Cía:</td><td style="padding: 5px; width: 30%;">${correlativo}</td>
+              <td style="padding: 5px; font-weight: bold; color: #006B3F; width: 20%;">Correlativo Gen:</td><td style="padding: 5px; width: 30%;">${document.getElementById("correlativo-gen")?.value || "S-N"}</td>
+            </tr>
+            <tr>
+              <td style="padding: 5px; font-weight: bold; color: #006B3F;">Fecha:</td><td style="padding: 5px;">${fecha}</td>
+              <td style="padding: 5px; font-weight: bold; color: #006B3F;">Hora:</td><td style="padding: 5px;">${document.getElementById("hora-acto")?.value || "N/E"}</td>
+            </tr>
+            <tr>
+              <td style="padding: 5px; font-weight: bold; color: #006B3F;">Clave del Acto:</td><td style="padding: 5px;">${document.getElementById("clave-acto")?.value || "N/E"}</td>
+              <td style="padding: 5px; font-weight: bold; color: #006B3F;">Dirección:</td><td style="padding: 5px;">${document.getElementById("direccion-acto")?.value || "N/E"} (${document.getElementById("poblacion-villa")?.value || "N/E"})</td>
+            </tr>
+          </table>
+
+          <div style="page-break-inside: avoid;">
+            <h4 style="color: #006B3F; border-bottom: 2px solid #006B3F; padding-bottom: 4px; margin-top: 20px; font-size: 14px;">1. Personal Asistente al Acto</h4>
+            <table style="width: 100%; border-collapse: collapse; font-size: 12px; margin-bottom: 20px;">
+              <thead>
+                <tr style="background-color: #006B3F; color: white;">
+                  <th style="padding: 6px; border: 1px solid #006B3F; text-align: left; width: 10%;">N°</th>
+                  <th style="padding: 6px; border: 1px solid #006B3F; text-align: left;">Nombre Completo</th>
+                  <th style="padding: 6px; border: 1px solid #006B3F; text-align: center; width: 15%;">Calidad</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${filasAsistentes || '<tr><td colspan="3" style="text-align: center; padding: 8px; border: 1px solid #dee2e6;">Sin voluntarios registrados en el acto.</td></tr>'}
+              </tbody>
+            </table>
+          </div>
+
+          <div style="page-break-inside: avoid;">
+            <h4 style="color: #006B3F; border-bottom: 2px solid #006B3F; padding-bottom: 4px; margin-top: 20px; font-size: 14px;">2. Personal Permaneció en Cuartel</h4>
+            <table style="width: 100%; border-collapse: collapse; font-size: 12px; margin-bottom: 20px;">
+              <thead>
+                <tr style="background-color: #1C1C1C; color: white;">
+                  <th style="padding: 6px; border: 1px solid #1C1C1C; text-align: left; width: 10%;">N°</th>
+                  <th style="padding: 6px; border: 1px solid #1C1C1C; text-align: left;">Nombre Completo</th>
+                  <th style="padding: 6px; border: 1px solid #1C1C1C; text-align: center; width: 15%;">Calidad</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${filasCuartel || '<tr><td colspan="3" style="text-align: center; padding: 8px; border: 1px solid #dee2e6;">Sin personal registrado en cuartel.</td></tr>'}
+              </tbody>
+            </table>
+          </div>
+
+          <div style="page-break-inside: avoid;">
+            <h4 style="color: #006B3F; border-bottom: 2px solid #006B3F; padding-bottom: 4px; margin-top: 20px; font-size: 14px;">3. Observaciones y Resumen del Servicio</h4>
+            <div style="border: 1px solid #dee2e6; padding: 12px; background-color: #f8f9fa; border-radius: 4px; font-size: 12px; line-height: 1.5;">
+              ${obs.replace(/\n/g, '<br>')}
+            </div>
+          </div>
+        `;
+      } else {
+        contenidoHTML += `<p style="text-align: center; padding: 20px;">Reporte Oficial de Servicio.</p>`;
+      }
+
+      contenedorPDF.innerHTML = contenidoHTML;
 
       const opciones = {
         margin:       [10, 10, 10, 10],
         filename:     nombrePDF,
         image:        { type: 'jpeg', quality: 0.98 },
-        html2canvas:  { scale: 2, useCORS: true, logging: false, scrollY: 0 },
+        html2canvas:  { scale: 2, logging: false },
         jsPDF:        { unit: 'mm', format: 'letter', orientation: 'portrait' }
       };
 
       try {
-        await html2pdf().set(opciones).from(clonElemento).save();
+        await html2pdf().set(opciones).from(contenedorPDF).save();
       } catch (error) {
         console.error("Error al generar PDF:", error);
-        alert("Ocurrió un inconveniente al generar el PDF. Intente de nuevo.");
+        alert("Ocurrió un inconveniente al generar el PDF.");
       } finally {
         botonPresionado.innerHTML = textoOriginal;
         botonPresionado.disabled = false;
@@ -690,7 +594,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
-  // ENVÍO DE DATOS A EMAILJS Y PERSISTENCIA EN SUPABASE
+  // 7. ENVÍO DE DATOS A EMAILJS Y SUPABASE
   document.querySelectorAll(".btn-enviar-correo").forEach(btn => {
     btn.addEventListener("click", async (e) => {
       const botonPresionado = e.currentTarget;
@@ -785,111 +689,6 @@ ${observaciones}
           usuario_id: 1,
           asistencia: asistenciaBackend
         };
-      } 
-      else if (formId === "pills-vehicular") {
-        correlativoVal = document.getElementById("correlativo-veh")?.value || "S-N";
-        fechaVal = document.getElementById("fecha-veh")?.value || fechaVal;
-        const hora = document.getElementById("hora-veh")?.value || "N/E";
-        const clave = document.getElementById("clave-vehicular")?.value || "N/E";
-        const direccion = document.getElementById("direccion-veh")?.value || "N/E";
-        const observaciones = document.getElementById("obs-rescate-vehicular")?.value || "Sin observaciones.";
-
-        let listaAsistentesText = "";
-        let asistenciaBackend = [];
-
-        asistentesRescateAgregados.forEach(vol => {
-          listaAsistentesText += `- N° ${vol.num}: ${vol.nombre} (${vol.tipo})\n`;
-          asistenciaBackend.push({ num_voluntario: vol.num, nombre_voluntario: vol.nombre, tipo_asistencia: "Rescate" });
-        });
-
-        reporteEstructurado = `PARTE OFICIAL DE RESCATE VEHICULAR - BOMBA O'HIGGINS
---------------------------------------------------
-DATOS DEL RESCATE:
-• Correlativo Cía: ${correlativoVal}
-• Fecha: ${fechaVal} | Hora: ${hora}
-• Clave Rescate: ${clave}
-• Dirección / Ruta: ${direccion}
-
-DATOS VEHÍCULO Y CONDUCTOR:
-• Conductor: ${document.getElementById("v1-nombre")?.value || "N/E"} (RUT: ${document.getElementById("v1-ci")?.value || "N/E"})
-• Vehículo: ${document.getElementById("v1-marca")?.value || "N/E"} ${document.getElementById("v1-modelo")?.value || ""} | Patente: ${document.getElementById("v1-patente")?.value || "N/E"}
-• Lesionados Trasladados a: ${document.getElementById("v1-derivado")?.value || "N/E"}
-
-MATERIAL MENOR UTILIZADO:
-• Collares: ${document.getElementById("mat-collares")?.value || "0"} | Tablas: ${document.getElementById("mat-tablas")?.value || "0"} | Chalecos: ${document.getElementById("mat-chalecos")?.value || "0"}
-
-PERSONAL ASISTENTE AL RESCATE:
-${listaAsistentesText || "Sin asistentes registrados."}
-
-OBSERVACIONES DEL RESCATE:
-${observaciones}
---------------------------------------------------`;
-
-        datosParaBackend = {
-          correlativo_cia: parseInt(correlativoVal) || 0,
-          correlativo_gen: 0,
-          fecha: fechaVal,
-          hora: hora !== "N/E" ? hora : "00:00",
-          clave: clave,
-          direccion: direccion,
-          poblacion: "Carretera / Vía Pública",
-          lugar_tipo: "Rescate Vehicular",
-          construccion_tipo: "N/A",
-          observaciones: observaciones,
-          usuario_id: 1,
-          asistencia: asistenciaBackend
-        };
-      } 
-      else if (formId === "pills-asistencia") {
-        fechaVal = document.getElementById("fecha-citacion-asistencia")?.value || fechaVal;
-        const citacion = document.getElementById("tipo-citacion-asistencia")?.value || "N/E";
-        const oficialCargo = document.getElementById("oficial-a-cargo-asistencia")?.value || "N/E";
-        const observaciones = document.getElementById("obs-asistencia-general")?.value || "Sin observaciones.";
-
-        let presentesText = "";
-        let countPresentes = 0;
-        let asistenciaBackend = [];
-
-        Object.keys(registroAsistencia).forEach(num => {
-          if (registroAsistencia[num] === true) {
-            const vol = voluntariosCompania.find(v => v.num == num);
-            if (vol) {
-              presentesText += `- N° ${vol.num}: ${vol.nombre} (${vol.tipo})\n`;
-              countPresentes++;
-              asistenciaBackend.push({ num_voluntario: vol.num, nombre_voluntario: vol.nombre, tipo_asistencia: "Presente" });
-            }
-          }
-        });
-
-        reporteEstructurado = `CONTROL OFICIAL DE ASISTENCIA - BOMBA O'HIGGINS
---------------------------------------------------
-DATOS DE LA CITACIÓN:
-• Tipo de Actividad: ${citacion}
-• Fecha: ${fechaVal} | Hora Inicio: ${document.getElementById("hora-inicio-asistencia")?.value || "N/E"}
-• Oficial a Cargo: ${oficialCargo}
-• Total Presentes: ${countPresentes} de ${voluntariosCompania.length} Voluntarios
-
-LISTA DE VOLUNTARIOS PRESENTES:
-${presentesText || "Sin voluntarios marcados como presentes."}
-
-OBSERVACIONES:
-${observaciones}
---------------------------------------------------`;
-
-        datosParaBackend = {
-          correlativo_cia: 0,
-          correlativo_gen: 0,
-          fecha: fechaVal,
-          hora: document.getElementById("hora-inicio-asistencia")?.value || "00:00",
-          clave: citacion,
-          direccion: "Cuartel Primera Compañía",
-          poblacion: "Rancagua",
-          lugar_tipo: "Citación / Asistencia",
-          construccion_tipo: "N/A",
-          observaciones: `Oficial a Cargo: ${oficialCargo}. ${observaciones}`,
-          usuario_id: 1,
-          asistencia: asistenciaBackend
-        };
       }
 
       const textoOriginal = botonPresionado.innerHTML;
@@ -897,17 +696,14 @@ ${observaciones}
       botonPresionado.disabled = true;
 
       try {
-        // 1. Guardar en Supabase a través de Render
         await guardarParteEnBackend(datosParaBackend);
 
-        // 2. Enviar a EmailJS con la plantilla visual
         const parametrosPlantilla = {
           asunto: `Parte Oficial N° ${correlativoVal} - Bomba O'Higgins (${fechaVal})`,
           mensaje: reporteEstructurado
         };
 
         await emailjs.send("service_0j6b43d", "template_e631aiq", parametrosPlantilla);
-
         alert("✅ Parte registrado exitosamente en la Base de Datos y enviado por correo a partesbombaohiggins@gmail.com");
       } catch (error) {
         console.error("Error en el proceso:", error);
