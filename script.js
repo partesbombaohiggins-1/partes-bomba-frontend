@@ -471,7 +471,7 @@ document.addEventListener("DOMContentLoaded", () => {
   renderizarListaAsistencia();
 
   // ==========================================
-  // 6. GENERADOR DE PDF OFICIAL LIMPIO Y COMPATIBLE
+  // 6. GENERADOR DE PDF ADJUNTANDO CONTENEDOR AL DOM
   // ==========================================
   document.querySelectorAll(".btn-descargar-pdf").forEach(btn => {
     btn.addEventListener("click", async (e) => {
@@ -486,12 +486,17 @@ document.addEventListener("DOMContentLoaded", () => {
       const fecha = document.getElementById("fecha-acto")?.value || new Date().toISOString().slice(0, 10);
       const nombrePDF = `Parte_Servicio_Bomba_OHiggins_N${correlativo}_${fecha}.pdf`;
 
-      // Contenedor temporal de texto y tablas puras sin gráficos ni SVGs pesados
+      // Crear un elemento visible temporalmente en el DOM para capturar el PDF correctamente
       const contenedorPDF = document.createElement("div");
+      contenedorPDF.id = "pdf-render-temp";
+      contenedorPDF.style.width = "750px";
       contenedorPDF.style.padding = "25px";
       contenedorPDF.style.fontFamily = "Arial, sans-serif";
       contenedorPDF.style.color = "#1C1C1C";
       contenedorPDF.style.backgroundColor = "#ffffff";
+      contenedorPDF.style.position = "absolute";
+      contenedorPDF.style.left = "-9999px"; // Fuera de vista
+      contenedorPDF.style.top = "0";
 
       let contenidoHTML = `
         <div style="border-bottom: 3px solid #006B3F; padding-bottom: 12px; margin-bottom: 20px; text-align: center;">
@@ -573,6 +578,7 @@ document.addEventListener("DOMContentLoaded", () => {
       }
 
       contenedorPDF.innerHTML = contenidoHTML;
+      document.body.appendChild(contenedorPDF); // Adjuntar temporalmente al DOM
 
       const opciones = {
         margin:       [10, 10, 10, 10],
@@ -588,6 +594,9 @@ document.addEventListener("DOMContentLoaded", () => {
         console.error("Error al generar PDF:", error);
         alert("Ocurrió un inconveniente al generar el PDF.");
       } finally {
+        if (document.getElementById("pdf-render-temp")) {
+          document.body.removeChild(contenedorPDF); // Limpiar DOM
+        }
         botonPresionado.innerHTML = textoOriginal;
         botonPresionado.disabled = false;
       }
