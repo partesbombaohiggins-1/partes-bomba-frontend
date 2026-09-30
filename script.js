@@ -99,7 +99,7 @@ async function guardarParteEnBackend(datosParte) {
       console.error("❌ Error retornado por el servidor:", resultado.error);
     }
   } catch (error) {
-    console.error("⚠️️ Error de conexión con el backend:", error);
+    console.error("⚠️ Error de conexión con el backend:", error);
   }
 }
 
@@ -659,7 +659,8 @@ document.addEventListener("DOMContentLoaded", () => {
       const fecha = document.getElementById("fecha-acto")?.value || new Date().toISOString().slice(0, 10);
       const nombrePDF = `Parte_Servicio_Bomba_OHiggins_N${correlativo}_${fecha}.pdf`;
 
-      const elementosOcultar = elementoForm.querySelectorAll(".btn, .form-switch, input[type='file'], .list-group, #resultados-busqueda, #resultados-busqueda-cuartel");
+      // Ocultar botones, menús flotantes e imágenes no compatibles durante la captura
+      const elementosOcultar = elementoForm.querySelectorAll(".btn, .form-switch, input[type='file'], .list-group, #resultados-busqueda, #resultados-busqueda-cuartel, img");
       elementosOcultar.forEach(el => el.style.display = "none");
 
       const opciones = {
