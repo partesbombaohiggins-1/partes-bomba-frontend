@@ -78,6 +78,31 @@ const voluntariosCompania = [
   { num: 76, nombre: "Arriagada Contreras Joaquin", tipo: "VA" }
 ];
 
+// URL Base de la API REST backend en Render
+const API_URL = "https://partes-bomba-backend.onrender.com/api";
+
+// Función auxiliar para registrar el parte en la base de datos Supabase
+async function guardarParteEnBackend(datosParte) {
+  try {
+    const respuesta = await fetch(`${API_URL}/partes`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(datosParte)
+    });
+
+    const resultado = await respuesta.json();
+    if (respuesta.ok) {
+      console.log("✅ Registro exitoso en Supabase:", resultado);
+    } else {
+      console.error("❌ Error retornado por el servidor:", resultado.error);
+    }
+  } catch (error) {
+    console.error("⚠️ Error de conexión con el backend:", error);
+  }
+}
+
 document.addEventListener("DOMContentLoaded", () => {
 
   function normalizarTexto(str) {
@@ -614,7 +639,7 @@ document.addEventListener("DOMContentLoaded", () => {
   renderizarListaAsistencia();
 
   // ==========================================
-  // 7. DESCARGA LOCAL DE PDF Y ENVÍO RECOPILADO POR CORREO
+  // 7. DESCARGA LOCAL DE PDF Y ENVÍO RECOPILADO POR CORREO Y BACKEND
   // ==========================================
 
   // DESCARGA LOCAL DE ARCHIVO PDF
@@ -658,15 +683,31 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
-  // ENVÍO DE DATOS TEXTUALES COMPLETOS A EMAILJS (USA TEMPLATE ID template_e631aiq)
+  // ENVÍO DE DATOS A EMAILJS Y PERSISTENCIA EN SUPABASE
   document.querySelectorAll(".btn-enviar-correo").forEach(btn => {
-    btn.addEventListener("click", (e) => {
+    btn.addEventListener("click", async (e) => {
       const botonPresionado = e.currentTarget;
       const formId = botonPresionado.getAttribute("data-form");
 
       let reporteEstructurado = "";
       let correlativoVal = "S-N";
       let fechaVal = new Date().toISOString().slice(0, 10);
+
+      // Objeto genérico para la API
+      let datosParaBackend = {
+        correlativo_cia: 0,
+        correlativo_gen: 0,
+        fecha: fechaVal,
+        hora: "00:00",
+        clave: "",
+        direccion: "",
+        poblacion: "",
+        lugar_tipo: "",
+        construccion_tipo: "",
+        observaciones: "",
+        usuario_id: 1, // Usuario administrador por defecto
+        asistencia: []
+      };
 
       if (formId === "pills-general") {
         correlativoVal = document.getElementById("correlativo-cia")?.value || "S-N";
@@ -677,24 +718,29 @@ document.addEventListener("DOMContentLoaded", () => {
         const poblacion = document.getElementById("poblacion-villa")?.value || "N/E";
         const lugarTipo = document.getElementById("lugar-tipo")?.value || "N/E";
         const construccion = document.getElementById("construccion-tipo")?.value || "N/E";
-
-        let listaAsistentes = "";
-        document.querySelectorAll("#tabla-asistentes-cuerpo tr").forEach(tr => {
-          const celdas = tr.querySelectorAll("td");
-          if (celdas.length >= 3) {
-            listaAsistentes += `- N° ${celdas[0].innerText.trim()}: ${celdas[1].innerText.trim()} (${celdas[2].innerText.trim()})\n`;
-          }
-        });
-
-        let listaCuartel = "";
-        document.querySelectorAll("#tabla-cuartel-cuerpo tr").forEach(tr => {
-          const celdas = tr.querySelectorAll("td");
-          if (celdas.length >= 3) {
-            listaCuartel += `- N° ${celdas[0].innerText.trim()}: ${celdas[1].innerText.trim()} (${celdas[2].innerText.trim()})\n`;
-          }
-        });
-
         const observaciones = document.getElementById("observaciones-parte")?.value || "Sin observaciones.";
+
+        let listaAsistentesText = "";
+        let asistenciaBackend = [];
+
+        asistentesAgregados.forEach(vol => {
+          listaAsistentesText += `- N° ${vol.num}: ${vol.nombre} (${vol.tipo})\n`;
+          asistenciaBackend.push({
+            num_voluntario: vol.num,
+            nombre_voluntario: vol.nombre,
+            tipo_asistencia: "Asistió"
+          });
+        });
+
+        let listaCuartelText = "";
+        personalCuartelAgregado.forEach(vol => {
+          listaCuartelText += `- N° ${vol.num}: ${vol.nombre} (${vol.tipo})\n`;
+          asistenciaBackend.push({
+            num_voluntario: vol.num,
+            nombre_voluntario: vol.nombre,
+            tipo_asistencia: "Cuartel"
+          });
+        });
 
         reporteEstructurado = `PARTE OFICIAL DE SERVICIO GENERAL - BOMBA O'HIGGINS
 --------------------------------------------------
@@ -718,14 +764,29 @@ INVESTIGACIÓN Y ORIGEN:
 • Origen: ${document.getElementById("artefacto-origen")?.value || "N/E"} | Causa: ${document.getElementById("causa-fuego")?.value || "N/E"}
 
 PERSONAL ASISTENTE AL ACTO:
-${listaAsistentes || "Sin asistentes registrados."}
+${listaAsistentesText || "Sin asistentes registrados."}
 
 PERSONAL EN CUARTEL:
-${listaCuartel || "Sin personal registrado en cuartel."}
+${listaCuartelText || "Sin personal registrado en cuartel."}
 
 OBSERVACIONES / RESUMEN:
 ${observaciones}
 --------------------------------------------------`;
+
+        datosParaBackend = {
+          correlativo_cia: parseInt(correlativoVal) || 0,
+          correlativo_gen: parseInt(document.getElementById("correlativo-gen")?.value) || 0,
+          fecha: fechaVal,
+          hora: hora !== "N/E" ? hora : "00:00",
+          clave: clave,
+          direccion: direccion,
+          poblacion: poblacion,
+          lugar_tipo: lugarTipo,
+          construccion_tipo: construccion,
+          observaciones: observaciones,
+          usuario_id: 1,
+          asistencia: asistenciaBackend
+        };
       } 
       else if (formId === "pills-vehicular") {
         correlativoVal = document.getElementById("correlativo-veh")?.value || "S-N";
@@ -733,16 +794,19 @@ ${observaciones}
         const hora = document.getElementById("hora-veh")?.value || "N/E";
         const clave = document.getElementById("clave-vehicular")?.value || "N/E";
         const direccion = document.getElementById("direccion-veh")?.value || "N/E";
-
-        let listaAsistentes = "";
-        document.querySelectorAll("#tabla-asistentes-rescate-cuerpo tr").forEach(tr => {
-          const celdas = tr.querySelectorAll("td");
-          if (celdas.length >= 3) {
-            listaAsistentes += `- N° ${celdas[0].innerText.trim()}: ${celdas[1].innerText.trim()} (${celdas[2].innerText.trim()})\n`;
-          }
-        });
-
         const observaciones = document.getElementById("obs-rescate-vehicular")?.value || "Sin observaciones.";
+
+        let listaAsistentesText = "";
+        let asistenciaBackend = [];
+
+        asistentesRescateAgregados.forEach(vol => {
+          listaAsistentesText += `- N° ${vol.num}: ${vol.nombre} (${vol.tipo})\n`;
+          asistenciaBackend.push({
+            num_voluntario: vol.num,
+            nombre_voluntario: vol.nombre,
+            tipo_asistencia: "Rescate"
+          });
+        });
 
         reporteEstructurado = `PARTE OFICIAL DE RESCATE VEHICULAR - BOMBA O'HIGGINS
 --------------------------------------------------
@@ -761,30 +825,51 @@ MATERIAL MENOR UTILIZADO:
 • Collares: ${document.getElementById("mat-collares")?.value || "0"} | Tablas: ${document.getElementById("mat-tablas")?.value || "0"} | Chalecos: ${document.getElementById("mat-chalecos")?.value || "0"}
 
 PERSONAL ASISTENTE AL RESCATE:
-${listaAsistentes || "Sin asistentes registrados."}
+${listaAsistentesText || "Sin asistentes registrados."}
 
 OBSERVACIONES DEL RESCATE:
 ${observaciones}
 --------------------------------------------------`;
+
+        datosParaBackend = {
+          correlativo_cia: parseInt(correlativoVal) || 0,
+          correlativo_gen: 0,
+          fecha: fechaVal,
+          hora: hora !== "N/E" ? hora : "00:00",
+          clave: clave,
+          direccion: direccion,
+          poblacion: "Carretera / Vía Pública",
+          lugar_tipo: "Rescate Vehicular",
+          construccion_tipo: "N/A",
+          observaciones: observaciones,
+          usuario_id: 1,
+          asistencia: asistenciaBackend
+        };
       } 
       else if (formId === "pills-asistencia") {
         fechaVal = document.getElementById("fecha-citacion-asistencia")?.value || fechaVal;
         const citacion = document.getElementById("tipo-citacion-asistencia")?.value || "N/E";
         const oficialCargo = document.getElementById("oficial-a-cargo-asistencia")?.value || "N/E";
+        const observaciones = document.getElementById("obs-asistencia-general")?.value || "Sin observaciones.";
 
         let presentesText = "";
         let countPresentes = 0;
+        let asistenciaBackend = [];
+
         Object.keys(registroAsistencia).forEach(num => {
           if (registroAsistencia[num] === true) {
             const vol = voluntariosCompania.find(v => v.num == num);
             if (vol) {
               presentesText += `- N° ${vol.num}: ${vol.nombre} (${vol.tipo})\n`;
               countPresentes++;
+              asistenciaBackend.push({
+                num_voluntario: vol.num,
+                nombre_voluntario: vol.nombre,
+                tipo_asistencia: "Presente"
+              });
             }
           }
         });
-
-        const observaciones = document.getElementById("obs-asistencia-general")?.value || "Sin observaciones.";
 
         reporteEstructurado = `CONTROL OFICIAL DE ASISTENCIA - BOMBA O'HIGGINS
 --------------------------------------------------
@@ -800,12 +885,31 @@ ${presentesText || "Sin voluntarios marcados como presentes."}
 OBSERVACIONES:
 ${observaciones}
 --------------------------------------------------`;
+
+        datosParaBackend = {
+          correlativo_cia: 0,
+          correlativo_gen: 0,
+          fecha: fechaVal,
+          hora: document.getElementById("hora-inicio-asistencia")?.value || "00:00",
+          clave: citacion,
+          direccion: "Cuartel Primera Compañía",
+          poblacion: "Rancagua",
+          lugar_tipo: "Citación / Asistencia",
+          construccion_tipo: "N/A",
+          observaciones: `Oficial a Cargo: ${oficialCargo}. ${observaciones}`,
+          usuario_id: 1,
+          asistencia: asistenciaBackend
+        };
       }
 
       const textoOriginal = botonPresionado.innerHTML;
       botonPresionado.innerHTML = "⏳ Enviando parte...";
       botonPresionado.disabled = true;
 
+      // 1. Guardar registro en la Base de Datos de Supabase a través del backend en Render
+      await guardarParteEnBackend(datosParaBackend);
+
+      // 2. Enviar la notificación formal por correo vía EmailJS
       const parametrosPlantilla = {
         asunto: `Parte de Servicio N° ${correlativoVal} - Bomba O'Higgins (${fechaVal})`,
         mensaje: reporteEstructurado
@@ -813,11 +917,11 @@ ${observaciones}
 
       emailjs.send("service_0j6b43d", "template_e631aiq", parametrosPlantilla)
         .then(() => {
-          alert("✅ Parte de servicio enviado exitosamente con la información completa a partesbombaohiggins@gmail.com");
+          alert("✅ Parte registrado exitosamente en la Base de Datos y enviado por correo a partesbombaohiggins@gmail.com");
         })
         .catch((error) => {
           console.error("Error al enviar con EmailJS:", error);
-          alert("⚠️ No se pudo enviar el parte automáticamente. Verifique su conexión.");
+          alert("⚠️ El parte fue registrado en el sistema, pero ocurrió un inconveniente con la notificación por correo.");
         })
         .finally(() => {
           botonPresionado.innerHTML = textoOriginal;
