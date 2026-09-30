@@ -153,6 +153,13 @@ header.container {
 
 .table-responsive {
   border-radius: 6px;
+  max-height: none !important;
+  overflow: visible !important;
+}
+
+tr {
+  page-break-inside: avoid !important;
+  break-inside: avoid !important;
 }
 
 .sticky-top {
