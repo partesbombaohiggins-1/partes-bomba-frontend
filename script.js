@@ -656,7 +656,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
-  // 7. ENVÍO DE DATOS A EMAILJS Y SUPABASE
+  // 7. ENVÍO DE DATOS A EMAILJS Y SUPABASE (COMPATIBLE CON PLANTILLA "mensaje")
   document.querySelectorAll(".btn-enviar-correo").forEach(btn => {
     btn.addEventListener("click", async (e) => {
       const botonPresionado = e.currentTarget;
@@ -792,6 +792,44 @@ ${obsResc}
           usuario_id: 1,
           asistencia: asistenciaBackend
         };
+      } else if (formId === "pills-asistencia") {
+        fechaVal = document.getElementById("fecha-acto")?.value || fechaVal;
+        let listaAsistenciaText = "";
+        let totalPresentes = 0;
+        let asistenciaBackend = [];
+
+        voluntariosCompania.forEach(vol => {
+          const presente = registroAsistencia[vol.num];
+          if (presente) {
+            totalPresentes++;
+            listaAsistenciaText += `- N° ${vol.num}: ${vol.nombre} (${vol.tipo}) [PRESENTE]\n`;
+            asistenciaBackend.push({ num_voluntario: vol.num, nombre_voluntario: vol.nombre, tipo_asistencia: "Lista Asistencia" });
+          }
+        });
+
+        reporteEstructurado = `NÓMINA GENERAL DE ASISTENCIA - BOMBA O'HIGGINS
+--------------------------------------------------
+• Fecha del Registro: ${fechaVal}
+• Total Presentes: ${totalPresentes} / ${voluntariosCompania.length}
+
+VOLUNTARIOS PRESENTES:
+${listaAsistenciaText || "Sin voluntarios marcados como presentes."}
+--------------------------------------------------`;
+
+        datosParaBackend = {
+          correlativo_cia: 0,
+          correlativo_gen: 0,
+          fecha: fechaVal,
+          hora: "00:00",
+          clave: "ASISTENCIA",
+          direccion: "Cuartel Cía",
+          poblacion: "",
+          lugar_tipo: "Lista Asistencia",
+          construccion_tipo: "",
+          observaciones: "Registro de Asistencia General",
+          usuario_id: 1,
+          asistencia: asistenciaBackend
+        };
       }
 
       const textoOriginal = botonPresionado.innerHTML;
@@ -801,9 +839,10 @@ ${obsResc}
       try {
         await guardarParteEnBackend(datosParaBackend);
 
+        // Se envía tanto "mensaje" como "notes" para garantizar compatibilidad con cualquier plantilla de EmailJS
         const parametrosPlantilla = {
-          asunto: `Parte Oficial de Servicio - Bomba O'Higgins (${fechaVal})`,
-          mensaje: reporteEstructurado
+          mensaje: reporteEstructurado,
+          notes: reporteEstructurado
         };
 
         await emailjs.send("service_0j6b43d", "template_e631aiq", parametrosPlantilla);
