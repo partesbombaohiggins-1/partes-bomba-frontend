@@ -471,7 +471,7 @@ document.addEventListener("DOMContentLoaded", () => {
   renderizarListaAsistencia();
 
   // ==========================================
-  // 6. GENERADOR DE PDF ADJUNTANDO CONTENEDOR AL DOM
+  // 6. GENERADOR DE PDF OFICIAL LIMPIO Y COMPATIBLE
   // ==========================================
   document.querySelectorAll(".btn-descargar-pdf").forEach(btn => {
     btn.addEventListener("click", async (e) => {
@@ -486,21 +486,22 @@ document.addEventListener("DOMContentLoaded", () => {
       const fecha = document.getElementById("fecha-acto")?.value || new Date().toISOString().slice(0, 10);
       const nombrePDF = `Parte_Servicio_Bomba_OHiggins_N${correlativo}_${fecha}.pdf`;
 
-      // Crear un elemento visible temporalmente en el DOM para capturar el PDF correctamente
+      // Contenedor temporal montado sobre el viewport pero oculto detrás de la capa principal
       const contenedorPDF = document.createElement("div");
       contenedorPDF.id = "pdf-render-temp";
       contenedorPDF.style.width = "750px";
-      contenedorPDF.style.padding = "25px";
+      contenedorPDF.style.padding = "30px";
       contenedorPDF.style.fontFamily = "Arial, sans-serif";
       contenedorPDF.style.color = "#1C1C1C";
       contenedorPDF.style.backgroundColor = "#ffffff";
-      contenedorPDF.style.position = "absolute";
-      contenedorPDF.style.left = "-9999px"; // Fuera de vista
+      contenedorPDF.style.position = "fixed";
+      contenedorPDF.style.left = "0";
       contenedorPDF.style.top = "0";
+      contenedorPDF.style.zIndex = "-99999"; // Oculto detrás de la interfaz pero renderizable por Canvas
 
       let contenidoHTML = `
         <div style="border-bottom: 3px solid #006B3F; padding-bottom: 12px; margin-bottom: 20px; text-align: center;">
-          <h2 style="color: #006B3F; margin: 0; font-size: 20px; letter-spacing: 0.5px;">PRIMERA COMPAÑÍA BOMBA O'HIGGINS</h2>
+          <h2 style="color: #006B3F; margin: 0; font-size: 20px; font-weight: bold; letter-spacing: 0.5px;">PRIMERA COMPAÑÍA BOMBA O'HIGGINS</h2>
           <p style="color: #D4AF37; margin: 4px 0 0 0; font-size: 13px; font-weight: bold;">CUERPO DE BOMBEROS DE RANCAGUA — PARTE OFICIAL DE SERVICIO</p>
         </div>
       `;
@@ -578,13 +579,13 @@ document.addEventListener("DOMContentLoaded", () => {
       }
 
       contenedorPDF.innerHTML = contenidoHTML;
-      document.body.appendChild(contenedorPDF); // Adjuntar temporalmente al DOM
+      document.body.appendChild(contenedorPDF);
 
       const opciones = {
         margin:       [10, 10, 10, 10],
         filename:     nombrePDF,
         image:        { type: 'jpeg', quality: 0.98 },
-        html2canvas:  { scale: 2, logging: false },
+        html2canvas:  { scale: 2, logging: false, windowWidth: 800 },
         jsPDF:        { unit: 'mm', format: 'letter', orientation: 'portrait' }
       };
 
@@ -594,8 +595,9 @@ document.addEventListener("DOMContentLoaded", () => {
         console.error("Error al generar PDF:", error);
         alert("Ocurrió un inconveniente al generar el PDF.");
       } finally {
-        if (document.getElementById("pdf-render-temp")) {
-          document.body.removeChild(contenedorPDF); // Limpiar DOM
+        const tempElem = document.getElementById("pdf-render-temp");
+        if (tempElem) {
+          document.body.removeChild(tempElem);
         }
         botonPresionado.innerHTML = textoOriginal;
         botonPresionado.disabled = false;
